@@ -91,3 +91,20 @@ class SubmitForm(Resource):
         appointment["form"] = form
         appointment["status"] = "CHECKED_IN"
         return appointment
+
+SummonPatientParser = api.parser()
+SummonPatientParser.add_argument("special_instructions", type=str, help="Special instructions for patients to enter, due to COVID risk or something else",
+                               required=False, location="form")
+
+@api.route("/<string:appointment_id>/summonpatient")
+class SubmitForm(Resource):
+    @api.expect(SummonPatientParser)
+    def post(self, appointment_id):
+        args = SummonPatientParser.parse_args()
+        appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
+        if not appointment:
+            return ("Appointment not found.", 404)
+        if args.special_instructions:
+            appointment["special_instructions"] = args.special_instructions
+        appointment["status"] = "SUMMONED"
+        return appointment
