@@ -68,6 +68,6 @@ class CheckIn(Resource):
         dr_location = (appointment["lat"], appointment["long"])
         dist = distance.distance(patient_location, dr_location).km
         if dist > 1:
-            abort(400, "Distance of " + str(dist) + " is greater than 1 mile, check in not possible.")
+            abort(400, "Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
         appointment["status"] = "FILLING_FORMS"
         return appointment
