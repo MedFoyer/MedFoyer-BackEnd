@@ -1,12 +1,15 @@
 from flask_restplus import Resource, Namespace
+from flask import abort
 import uuid
+from geopy import distance
 
 appointments = [{"id": "guid",
                  "name": "Brian",
                  "status": "SCHEDULED",
                  "appointment_time": "1587791538037",
                  "display_address": "",
-                 "lat_long": "",
+                 "lat": "1",
+                 "long": "1",
                  }]
 
 # First param will be URL Prefix unless explicitly set when attaching to api object in Main.py
@@ -19,7 +22,9 @@ AppointmentParser.add_argument("appointment_time", type=str, help="Time of appoi
                                required=True, location="form")
 AppointmentParser.add_argument("display_address", type=str, help="Visible Address of Doctor's Address",
                                required=True, location="form")
-AppointmentParser.add_argument("lat_long", type=str, help="Latitute and Longitude of Doctor's Address",
+AppointmentParser.add_argument("lat", type=str, help="Latitute of Doctor's Address",
+                               required=True, location="form")
+AppointmentParser.add_argument("long", type=str, help="Longitude of Doctor's Address",
                                required=True, location="form")
 
 # Example API with arg routing
@@ -31,25 +36,38 @@ class Appointments(Resource):
     @api.expect(AppointmentParser)
     def post(self):
         appointment = AppointmentParser.parse_args()
+        # TODO validate valid decimal for lat long
         appointment["status"] = "SCHEDULED"
         appointment["id"] = str(uuid.uuid4())
         appointments.append(appointment)
         return appointment
 
-# Example API with arg routing
 @api.route("/<string:appointment_id>")
 class Appointment(Resource):
     def get(self, appointment_id):
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
-        return appointment if appointment else ({}, 404)
+        return appointment if appointment else ({"Appointment not found."}, 404)
 
-    @api.expect(AppointmentParser)
-    def post(self):
-        args = AppointmentParser.parse_args()
-        # check location
-        #if close, check in
-        if "id" in args:
-            appointments.append({"id": args["id"]})
-            return True
-        else:
-            return "Missing username!"
+CheckInParser = api.parser()
+CheckInParser.add_argument("current_lat", type=str, help="Latitute of Patient checking in",
+                               required=True, location="form")
+CheckInParser.add_argument("current_long", type=str, help="Longitude of Patient checking in",
+                               required=True, location="form")
+
+@api.route("/<string:appointment_id>/checkin")
+class CheckIn(Resource):
+    @api.expect(CheckInParser)
+    def post(self, appointment_id):
+        #TODO validate valid decimal for lat long
+        appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
+        if not appointment:
+            return ({"Appointment not found."}, 404)
+
+        args = CheckInParser.parse_args()
+        patient_location = (args.current_lat, args.current_long)
+        dr_location = (appointment["lat"], appointment["long"])
+        dist = distance.distance(patient_location, dr_location).miles
+        if dist > 1:
+            abort(400, "Distance of " + str(dist) + " is greater than 1, check in not possible.")
+        appointment["status"] = "FILLING_FORMS"
+        return appointment
