@@ -13,26 +13,6 @@ CORS(app)
 
 api.add_namespace(example_namespace, path="/path")
 
-WaitlistParser = api.parser()
-WaitlistParser.add_argument("user", type=str, help="Playbook as a JSON String",
-                        required=True, location="json", dest="username")
-
-
-@api.route("/Waitlist")
-class User(Resource):
-    def get(self):
-        return users
-
-    @api.expect(UserParser)
-    def post(self):
-        args = UserParser.parse_args()
-        if "username" in args:
-            users.append({"username": args["username"]})
-            return True
-        else:
-            return "Missing username!"
-
-
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
 
