@@ -46,7 +46,7 @@ class Appointments(Resource):
 class Appointment(Resource):
     def get(self, appointment_id):
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
-        return appointment if appointment else ({"Appointment not found."}, 404)
+        return appointment if appointment else ("Appointment not found.", 404)
 
 CheckInParser = api.parser()
 CheckInParser.add_argument("current_lat", type=str, help="Latitute of Patient checking in",
@@ -61,12 +61,12 @@ class CheckIn(Resource):
         #TODO validate valid decimal for lat long
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
         if not appointment:
-            return ({"Appointment not found."}, 404)
+            return ("Appointment not found.", 404)
 
         args = CheckInParser.parse_args()
         patient_location = (args.current_lat, args.current_long)
         dr_location = (appointment["lat"], appointment["long"])
-        dist = distance.distance(patient_location, dr_location).miles
+        dist = distance.distance(patient_location, dr_location).km
         if dist > 1:
             abort(400, "Distance of " + str(dist) + " is greater than 1, check in not possible.")
         appointment["status"] = "FILLING_FORMS"
