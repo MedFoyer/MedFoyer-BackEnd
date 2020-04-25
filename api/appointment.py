@@ -2,6 +2,7 @@ from flask_restplus import Resource, Namespace
 from flask import abort
 import uuid
 from geopy import distance
+import json
 
 appointments = [{"id": "guid",
                  "name": "Brian",
@@ -70,4 +71,23 @@ class CheckIn(Resource):
         if dist > 1:
             abort(400, "Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
         appointment["status"] = "FILLING_FORMS"
+        return appointment
+
+SubmitFormParser = api.parser()
+SubmitFormParser.add_argument("form", help="Stringified JSON blob as COVID check in form",
+                               required=True, location="json")
+
+#TODO: needs validation
+@api.route("/<string:appointment_id>/submitform")
+class SubmitForm(Resource):
+    @api.expect(SubmitFormParser)
+    def post(self, appointment_id):
+        args = SubmitFormParser.parse_args()
+        form = json.loads(args.form)
+        appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
+        if not appointment:
+            return ("Appointment not found.", 404)
+
+        appointment["form"] = form
+        appointment["status"] = "CHECKED_IN"
         return appointment
