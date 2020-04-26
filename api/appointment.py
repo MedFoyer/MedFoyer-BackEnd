@@ -51,9 +51,9 @@ class Appointment(Resource):
 
 CheckInParser = api.parser()
 CheckInParser.add_argument("current_lat", type=str, help="Latitute of Patient checking in",
-                               required=True, location="form")
+                               required=True, location="json")
 CheckInParser.add_argument("current_long", type=str, help="Longitude of Patient checking in",
-                               required=True, location="form")
+                               required=True, location="json")
 
 @api.route("/<string:appointment_id>/checkin")
 class CheckIn(Resource):
