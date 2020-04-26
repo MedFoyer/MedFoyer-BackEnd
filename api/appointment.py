@@ -91,7 +91,7 @@ class SubmitForm(Resource):
             return ("Appointment not found.", 404)
         covid_flag = "NORMAL"
         for question in form:
-            if question["value"] in true_values:
+            if question.get("value", None) in true_values:
                 covid_flag = "AT_RISK"
 
         appointment["covid_flag"] = covid_flag
