@@ -17,15 +17,17 @@ appointments = [{"id": "guid",
 api = Namespace("appointment", description="Example Namespace")
 
 AppointmentParser = api.parser()
-AppointmentParser.add_argument("name", type=str, help="Patient name",
-                               required=True, location="json")
-AppointmentParser.add_argument("appointment_time", type=str, help="Time of appointment in unix epoch time",
-                               required=True, location="json")
-AppointmentParser.add_argument("display_address", type=str, help="Visible Address of Doctor's Address",
-                               required=True, location="json")
-AppointmentParser.add_argument("lat", type=str, help="Latitute of Doctor's Address",
-                               required=True, location="json")
-AppointmentParser.add_argument("long", type=str, help="Longitude of Doctor's Address",
+# AppointmentParser.add_argument("name", type=str, help="Patient name",
+#                                required=True, location="json")
+# AppointmentParser.add_argument("appointment_time", type=str, help="Time of appointment in unix epoch time",
+#                                required=True, location="json")
+# AppointmentParser.add_argument("display_address", type=str, help="Visible Address of Doctor's Address",
+#                                required=True, location="json")
+# AppointmentParser.add_argument("lat", type=str, help="Latitute of Doctor's Address",
+#                                required=True, location="json")
+# AppointmentParser.add_argument("long", type=str, help="Longitude of Doctor's Address",
+#                                required=True, location="json")
+AppointmentParser.add_argument("form", help="Stringified JSON blob for appointment",
                                required=True, location="json")
 
 # Example API with arg routing
@@ -36,10 +38,17 @@ class Appointments(Resource):
 
     @api.expect(AppointmentParser)
     def post(self):
-        appointment = AppointmentParser.parse_args()
+        args = AppointmentParser.parse_args()
+        appointment_raw = json.loads(args.form)
+        appointment = {"status" : "SCHEDULED"}
         # TODO validate valid decimal for lat long
-        appointment["status"] = "SCHEDULED"
+        #appointment["status"] = "SCHEDULED"
         appointment["id"] = str(uuid.uuid4())
+        appointment["name"] = next((it for it in appointment_raw if it["name"] == "name")).get("value")
+        appointment["appointment_time"] = next((it for it in appointment_raw if it["name"] == "appointment_time")).get("value")
+        appointment["display_address"] = next((it for it in appointment_raw if it["name"] == "display_address")).get("value")
+        appointment["lat"] = next((it for it in appointment_raw if it["name"] == "lat")).get("value")
+        appointment["long"] = next((it for it in appointment_raw if it["name"] == "long")).get("value")
         appointments.append(appointment)
         return appointment
 
