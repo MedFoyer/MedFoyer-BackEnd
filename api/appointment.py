@@ -7,7 +7,7 @@ import json
 appointments = [{"id": "guid",
                  "name": "Brian",
                  "status": "SCHEDULED",
-                 "appointment_time": "1587791538037",
+                 "appointment_time": "12:00",
                  "display_address": "",
                  "lat": "1",
                  "long": "1",
