@@ -18,15 +18,15 @@ api = Namespace("appointment", description="Example Namespace")
 
 AppointmentParser = api.parser()
 AppointmentParser.add_argument("name", type=str, help="Patient name",
-                               required=True, location="form")
+                               required=True, location="json")
 AppointmentParser.add_argument("appointment_time", type=str, help="Time of appointment in unix epoch time",
-                               required=True, location="form")
+                               required=True, location="json")
 AppointmentParser.add_argument("display_address", type=str, help="Visible Address of Doctor's Address",
-                               required=True, location="form")
+                               required=True, location="json")
 AppointmentParser.add_argument("lat", type=str, help="Latitute of Doctor's Address",
-                               required=True, location="form")
+                               required=True, location="json")
 AppointmentParser.add_argument("long", type=str, help="Longitude of Doctor's Address",
-                               required=True, location="form")
+                               required=True, location="json")
 
 # Example API with arg routing
 @api.route("/")
