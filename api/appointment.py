@@ -77,6 +77,8 @@ SubmitFormParser = api.parser()
 SubmitFormParser.add_argument("form", help="Stringified JSON blob as COVID check in form",
                                required=True, location="json")
 
+true_values = frozenset(["yes", "1", "2", "3", "4"])
+
 #TODO: needs validation
 @api.route("/<string:appointment_id>/submitform")
 class SubmitForm(Resource):
@@ -87,7 +89,12 @@ class SubmitForm(Resource):
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
         if not appointment:
             return ("Appointment not found.", 404)
+        covid_flag = "NORMAL"
+        for question in form:
+            if question["value"] in true_values:
+                covid_flag = "AT_RISK"
 
+        appointment["covid_flag"] = covid_flag
         appointment["form"] = form
         appointment["status"] = "CHECKED_IN"
         return appointment
