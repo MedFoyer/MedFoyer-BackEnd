@@ -77,7 +77,7 @@ SubmitFormParser = api.parser()
 SubmitFormParser.add_argument("form", help="Stringified JSON blob as COVID check in form",
                                required=True, location="json")
 
-true_values = frozenset(["yes", "1", "2", "3", "4"])
+true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
 
 #TODO: needs validation
 @api.route("/<string:appointment_id>/submitform")
