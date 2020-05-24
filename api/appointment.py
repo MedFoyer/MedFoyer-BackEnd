@@ -41,27 +41,32 @@ class Appointments(Resource):
     def post(self):
         args = AppointmentParser.parse_args()
         appointment_raw = json.loads(args.form)
-        appointment = {"status": "SCHEDULED"}
-        # TODO validate valid decimal for lat long
-        # appointment["status"] = "SCHEDULED"
-        appointment["id"] = str(uuid.uuid4())
-        appointment["name"] = next((it for it in appointment_raw if it["name"] == "name")).get("value")
-        appointment["appointment_time"] = next((it for it in appointment_raw if it["name"] == "appointment_time")).get(
-            "value")
-        appointment["display_address"] = next((it for it in appointment_raw if it["name"] == "display_address")).get(
-            "value")
-        appointment["lat"] = next((it for it in appointment_raw if it["name"] == "lat")).get("value")
-        appointment["long"] = next((it for it in appointment_raw if it["name"] == "long")).get("value")
-        appointment["dob"] = next((it for it in appointment_raw if it["name"] == "dob")).get("value")
+        appointment = {
+            "status": "SCHEDULED",
+            "id": str(uuid.uuid4()),
+            "name": next((it for it in appointment_raw if it["name"] == "name")).get("value"),
+            "appointment_time": next((it for it in appointment_raw if it["name"] == "appointment_time")).get("value"),
+            "display_address": next((it for it in appointment_raw if it["name"] == "display_address")).get("value"),
+            "lat": next((it for it in appointment_raw if it["name"] == "lat")).get("value"),
+            "long": next((it for it in appointment_raw if it["name"] == "long")).get("value"),
+            "dob": next((it for it in appointment_raw if it["name"] == "dob")).get("value")
+        }
         appointments.append(appointment)
         return appointment
-
 
 @api.route("/<string:appointment_id>")
 class Appointment(Resource):
     def get(self, appointment_id):
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
         return appointment if appointment else ("Appointment not found.", 404)
+
+    def delete(self, appointment_id):
+        appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
+        if appointment:
+            appointments.remove(appointment)
+            return ("Deleted", 200)
+        else:
+            return ("Appointment not found.", 404)
 
 
 CheckInParser = api.parser()
