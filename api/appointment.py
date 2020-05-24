@@ -98,7 +98,7 @@ class CheckIn(Resource):
             abort(400, "Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
         appointment["status"] = "FILLING_FORMS"
         appointment["patient_location"] = patient_location
-        appointment["checking_time"] = args.checkin_time
+        appointment["checkin_time"] = args.checkin_time
         return appointment
 
 
