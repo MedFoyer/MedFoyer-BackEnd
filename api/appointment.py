@@ -9,8 +9,8 @@ appointments = [{"id": "guid",
                  "status": "SCHEDULED",
                  "appointment_time": 1587791538037,
                  "display_address": "",
-                 "lat": "1",
-                 "long": "1",
+                 "lat": "39.28244",
+                 "long": "-94.65516",
                  }]
 
 # First param will be URL Prefix unless explicitly set when attaching to api object in Main.py
