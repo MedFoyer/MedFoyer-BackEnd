@@ -3,3 +3,12 @@ phases:
   install:
     runtime-versions:
         python: 3.8
+  build:
+    commands:
+      - export BUCKET=medfoyer-build-artifacts
+      - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --output-template-file outputtemplate.yml
+artifacts:
+  type: zip
+  files:
+    - template.yml
+    - outputtemplate.yml
