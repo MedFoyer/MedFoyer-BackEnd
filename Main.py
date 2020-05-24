@@ -3,7 +3,7 @@ from flask import Flask, url_for
 from flask_restplus import Api
 from flask_cors import CORS
 
-from api import example_namespace, appointment
+from api import appointment
 
 dev = os.getenv("DEV")
 
@@ -11,7 +11,6 @@ app = Flask(__name__)
 api = Api(app, version="0.0", title="MedFoyer API", doc="/" if dev else False)
 CORS(app)
 
-api.add_namespace(example_namespace, path="/path")
 api.add_namespace(appointment, path="/appointment")
 
 if __name__ == "__main__":
