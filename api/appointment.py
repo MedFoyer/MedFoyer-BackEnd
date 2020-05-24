@@ -7,7 +7,7 @@ import json
 appointments = [{"id": "guid",
                  "name": "Brian",
                  "status": "SCHEDULED",
-                 "appointment_time": "1587791538037",
+                 "appointment_time": 1587791538037,
                  "display_address": "",
                  "lat": "1",
                  "long": "1",
@@ -30,6 +30,7 @@ AppointmentParser = api.parser()
 AppointmentParser.add_argument("form", help="Stringified JSON blob for appointment",
                                required=True, location="json")
 
+
 # Example API with arg routing
 @api.route("/")
 class Appointments(Resource):
@@ -40,17 +41,21 @@ class Appointments(Resource):
     def post(self):
         args = AppointmentParser.parse_args()
         appointment_raw = json.loads(args.form)
-        appointment = {"status" : "SCHEDULED"}
+        appointment = {"status": "SCHEDULED"}
         # TODO validate valid decimal for lat long
-        #appointment["status"] = "SCHEDULED"
+        # appointment["status"] = "SCHEDULED"
         appointment["id"] = str(uuid.uuid4())
         appointment["name"] = next((it for it in appointment_raw if it["name"] == "name")).get("value")
-        appointment["appointment_time"] = next((it for it in appointment_raw if it["name"] == "appointment_time")).get("value")
-        appointment["display_address"] = next((it for it in appointment_raw if it["name"] == "display_address")).get("value")
+        appointment["appointment_time"] = next((it for it in appointment_raw if it["name"] == "appointment_time")).get(
+            "value")
+        appointment["display_address"] = next((it for it in appointment_raw if it["name"] == "display_address")).get(
+            "value")
         appointment["lat"] = next((it for it in appointment_raw if it["name"] == "lat")).get("value")
         appointment["long"] = next((it for it in appointment_raw if it["name"] == "long")).get("value")
+        appointment["dob"] = next((it for it in appointment_raw if it["name"] == "dob")).get("value")
         appointments.append(appointment)
         return appointment
+
 
 @api.route("/<string:appointment_id>")
 class Appointment(Resource):
@@ -58,17 +63,19 @@ class Appointment(Resource):
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
         return appointment if appointment else ("Appointment not found.", 404)
 
+
 CheckInParser = api.parser()
 CheckInParser.add_argument("current_lat", type=str, help="Latitute of Patient checking in",
-                               required=True, location="json")
+                           required=True, location="json")
 CheckInParser.add_argument("current_long", type=str, help="Longitude of Patient checking in",
-                               required=True, location="json")
+                           required=True, location="json")
+
 
 @api.route("/<string:appointment_id>/checkin")
 class CheckIn(Resource):
     @api.expect(CheckInParser)
     def post(self, appointment_id):
-        #TODO validate valid decimal for lat long
+        # TODO validate valid decimal for lat long
         appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
         if not appointment:
             return ("Appointment not found.", 404)
@@ -82,13 +89,15 @@ class CheckIn(Resource):
         appointment["status"] = "FILLING_FORMS"
         return appointment
 
+
 SubmitFormParser = api.parser()
 SubmitFormParser.add_argument("form", help="Stringified JSON blob as COVID check in form",
-                               required=True, location="json")
+                              required=True, location="json")
 
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
 
-#TODO: needs validation
+
+# TODO: needs validation
 @api.route("/<string:appointment_id>/submitform")
 class SubmitForm(Resource):
     @api.expect(SubmitFormParser)
@@ -108,9 +117,12 @@ class SubmitForm(Resource):
         appointment["status"] = "CHECKED_IN"
         return appointment
 
+
 SummonPatientParser = api.parser()
-SummonPatientParser.add_argument("special_instructions", type=str, help="Special instructions for patients to enter, due to COVID risk or something else",
-                               required=False, location="form")
+SummonPatientParser.add_argument("special_instructions", type=str,
+                                 help="Special instructions for patients to enter, due to COVID risk or something else",
+                                 required=False, location="form")
+
 
 @api.route("/<string:appointment_id>/summonpatient")
 class SubmitForm(Resource):
