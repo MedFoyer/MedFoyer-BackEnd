@@ -1,3 +1,5 @@
+import datetime
+
 from flask_restplus import Resource, Namespace
 from flask import abort
 import uuid
@@ -75,6 +77,8 @@ CheckInParser.add_argument("current_lat", type=str, help="Latitute of Patient ch
                            required=True, location="json")
 CheckInParser.add_argument("current_long", type=str, help="Longitude of Patient checking in",
                            required=True, location="json")
+CheckInParser.add_argument("checkin_time", type=int, help="Current UNIX Time (local)",
+                           required=True, location="json")
 
 
 @api.route("/<string:appointment_id>/checkin")
@@ -94,6 +98,7 @@ class CheckIn(Resource):
             abort(400, "Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
         appointment["status"] = "FILLING_FORMS"
         appointment["patient_location"] = patient_location
+        appointment["checking_time"] = args.checkin_time
         return appointment
 
 
