@@ -10,6 +10,6 @@ appointments = [{"id": "guid",
                  }]
 
 def handler(event, context):
-    appointment_id = event.payload.id
+    appointment_id = event.id
     appointment = next((ap for ap in appointments if ap["id"] == appointment_id), None);
     return appointment
