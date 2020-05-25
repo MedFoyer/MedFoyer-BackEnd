@@ -51,7 +51,8 @@ class Appointments(Resource):
             "display_address": next((it for it in appointment_raw if it["name"] == "display_address")).get("value"),
             "lat": next((it for it in appointment_raw if it["name"] == "lat")).get("value"),
             "long": next((it for it in appointment_raw if it["name"] == "long")).get("value"),
-            "dob": next((it for it in appointment_raw if it["name"] == "dob")).get("value")
+            "dob": next((it for it in appointment_raw if it["name"] == "dob")).get("value"),
+            "phone_num": next((it for it in appointment_raw if it["name"] == "phone_num")).get("value")
         }
         appointments.append(appointment)
         return appointment
