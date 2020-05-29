@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS resources for MedFoyer backend
+Parameters: 
+        EnvType: 
+                Description: Environment type.
+                Default: sandbox
+                Type: String
+                AllowedValues: 
+                        - prod
+                        - dev
+                        - sandbox
+                ConstraintDescription: must specify valid stage [prod|dev|sandbox].
+Resources:
+        GetAppointment:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-get-appointment"
+                        Handler: handlers/appointment.handler
+                        Runtime: python3.8
+                        CodeUri: ./
