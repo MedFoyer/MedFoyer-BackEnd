@@ -1,3 +1,5 @@
+import datetime
+
 from flask_restplus import Resource, Namespace
 from flask import abort
 import uuid
@@ -7,10 +9,10 @@ import json
 appointments = [{"id": "guid",
                  "name": "Brian",
                  "status": "SCHEDULED",
-                 "appointment_time": 1587791538037,
+                 "appointment_time": 1590354008510,
                  "display_address": "",
-                 "lat": "1",
-                 "long": "1",
+                 "lat": "39.28244",
+                 "long": "-94.65516",
                  }]
 
 # First param will be URL Prefix unless explicitly set when attaching to api object in Main.py
@@ -49,7 +51,8 @@ class Appointments(Resource):
             "display_address": next((it for it in appointment_raw if it["name"] == "display_address")).get("value"),
             "lat": next((it for it in appointment_raw if it["name"] == "lat")).get("value"),
             "long": next((it for it in appointment_raw if it["name"] == "long")).get("value"),
-            "dob": next((it for it in appointment_raw if it["name"] == "dob")).get("value")
+            "dob": next((it for it in appointment_raw if it["name"] == "dob")).get("value"),
+            "phone_num": next((it for it in appointment_raw if it["name"] == "phone_num")).get("value")
         }
         appointments.append(appointment)
         return appointment
@@ -75,6 +78,8 @@ CheckInParser.add_argument("current_lat", type=str, help="Latitute of Patient ch
                            required=True, location="json")
 CheckInParser.add_argument("current_long", type=str, help="Longitude of Patient checking in",
                            required=True, location="json")
+CheckInParser.add_argument("checkin_time", type=int, help="Current UNIX Time (local)",
+                           required=True, location="json")
 
 
 @api.route("/<string:appointment_id>/checkin")
@@ -93,6 +98,8 @@ class CheckIn(Resource):
         if dist > 1:
             abort(400, "Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
         appointment["status"] = "FILLING_FORMS"
+        appointment["patient_location"] = patient_location
+        appointment["checkin_time"] = args.checkin_time
         return appointment
 
 
