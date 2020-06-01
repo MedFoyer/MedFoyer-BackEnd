@@ -5,7 +5,7 @@ phases:
         python: 3.8
   build:
     commands:
-      - pip install --target ./package -r requirements.txt
+      - pip install --target . -r requirements.txt
       - export BUCKET=medfoyer-build-artifacts
       - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --output-template-file outputtemplate.yml
 artifacts:
