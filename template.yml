@@ -19,3 +19,10 @@ Resources:
                         Handler: handlers/appointment.handler
                         Runtime: python3.8
                         CodeUri: ./
+        CheckInAppointment:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-check-in-appointment"
+                        Handler: handlers/appointment.check_in_handler
+                        Runtime: python3.8
+                        CodeUri: ./
