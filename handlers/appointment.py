@@ -1,6 +1,10 @@
 import json
 import time
+import boto3
 from geopy import distance
+
+dynamodb = boto3.resource('dynamodb')
+appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
 
 appointments = [{"appointment_id": "guid",
                  "name": "Brian",
@@ -18,7 +22,9 @@ def handler(event, context):
 
 def check_in_handler(event, context):
     appointment_id = event['appointment_id']
-    appointment = next((ap for ap in appointments if ap["appointment_id"] == appointment_id), None);
+    dynamo_response = appointments_table.get_item(Key={"appointment_id" : ":appointment_id"},
+                                                  ExpressionAttributeNames={":appointment_id" : appointment_id})
+    appointment = dynamo_response.get("Item", None)
     if not appointment:
         raise RuntimeError("Appointment not found.")
     patient_location = (event["latitude"], event["longitude"])

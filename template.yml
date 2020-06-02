@@ -23,6 +23,7 @@ Resources:
                 Type: AWS::Serverless::Function
                 Properties:
                         FunctionName: !Sub "${EnvType}-check-in-appointment"
+                        Policies: AmazonDynamoDBFullAccess
                         Handler: handlers/appointment.check_in_handler
                         Runtime: python3.8
                         CodeUri: ./
