@@ -30,3 +30,33 @@ def check_in_handler(event, context):
     appointment["patient_location"] = patient_location
     appointment["check_in_time"] = int(time.time() * 1000)
     return appointment
+
+
+true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
+
+def submit_form_handler(event, context):
+    appointment_id = event['appointment_id']
+    form = json.loads(args.form)
+    appointment = next((ap for ap in appointments if ap["appointment_id"] == appointment_id), None);
+    if not appointment:
+        return ("Appointment not found.", 404)
+    covid_flag = "NORMAL"
+    for question in form:
+        if question.get("value", None) in true_values:
+            covid_flag = "AT_RISK"
+
+    appointment["covid_flag"] = covid_flag
+    appointment["form"] = form
+    appointment["status"] = "CHECKED_IN"
+    return appointment
+
+
+def summon_patient_handler(event, context):
+    appointment_id = event['appointment_id']
+    appointment = next((ap for ap in appointments if ap["appointment_id"] == appointment_id), None);
+    if not appointment:
+        return ("Appointment not found.", 404)
+    if args.special_instructions:
+        appointment["special_instructions"] = args.special_instructions
+    appointment["status"] = "SUMMONED"
+    return appointment

@@ -26,3 +26,17 @@ Resources:
                         Handler: handlers/appointment.check_in_handler
                         Runtime: python3.8
                         CodeUri: ./
+        SubmitAppointmentForm:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-submit-appointment-form"
+                        Handler: handlers/appointment.submit_form_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+        SummonPatient:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-summon-patient-appointment"
+                        Handler: handlers/appointment.summon_patient_handler
+                        Runtime: python3.8
+                        CodeUri: ./
