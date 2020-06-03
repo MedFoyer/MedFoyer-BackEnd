@@ -41,6 +41,8 @@ Resources:
                 Type: AWS::Serverless::Function
                 Properties:
                         FunctionName: !Sub "${EnvType}-summon-patient-appointment"
+                        Policies:
+                                - AmazonDynamoDBFullAccess
                         Handler: handlers/appointment.summon_patient_handler
                         Runtime: python3.8
                         CodeUri: ./
