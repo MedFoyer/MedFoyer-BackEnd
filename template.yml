@@ -31,7 +31,9 @@ Resources:
                 Type: AWS::Serverless::Function
                 Properties:
                         FunctionName: !Sub "${EnvType}-submit-appointment-form"
-                        Policies: AmazonS3FullAccess
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonS3FullAccess
                         Handler: handlers/appointment.submit_form_handler
                         Runtime: python3.8
                         CodeUri: ./

@@ -49,7 +49,7 @@ true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
 
 def submit_form_handler(event, context):
     appointment_id = event['appointment_id']
-    form = json.loads(args.form)
+    form = json.loads(event["form"])
     get_appointment(appointment_id)
     if not appointment:
         return ("Appointment not found.", 404)
