@@ -22,8 +22,7 @@ def handler(event, context):
 
 def check_in_handler(event, context):
     appointment_id = event['appointment_id']
-    dynamo_response = appointments_table.get_item(Key={"appointment_id" : ":appointment_id"},
-                                                  ExpressionAttributeNames={":appointment_id" : appointment_id})
+    dynamo_response = appointments_table.get_item(Key={"appointment_id" : appointment_id})
     appointment = dynamo_response.get("Item", None)
     if not appointment:
         raise RuntimeError("Appointment not found.")
