@@ -70,7 +70,7 @@ def submit_form_handler(event, context):
     appointments_table.put_item(Item=appointment)
     return appointment
 
-def get_appointment_forms_handler(event, context):
+def get_forms_handler(event, context):
     form_ids = event['form_ids']
     forms = []
     for form_id in form_ids:

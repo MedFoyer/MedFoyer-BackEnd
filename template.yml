@@ -37,13 +37,13 @@ Resources:
                         Handler: handlers/appointment.submit_form_handler
                         Runtime: python3.8
                         CodeUri: ./
-        GetAppointmentForms:
+        GetForms:
                 Type: AWS::Serverless::Function
                 Properties:
-                        FunctionName: !Sub "${EnvType}-get-appointment-forms"
+                        FunctionName: !Sub "${EnvType}-get-forms"
                         Policies:
                                 - AmazonS3FullAccess
-                        Handler: handlers/appointment.get_appointment_forms_handler
+                        Handler: handlers/appointment.get_forms_handler
                         Runtime: python3.8
                         CodeUri: ./
         SummonPatient:
