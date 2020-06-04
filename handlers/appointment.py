@@ -76,7 +76,8 @@ def summon_patient_handler(event, context):
     appointment = get_appointment(appointment_id)
     if not appointment:
         return ("Appointment not found.", 404)
-    if args.special_instructions:
-        appointment["special_instructions"] = args.special_instructions
+    if "special_instructions" in event:
+        appointment["special_instructions"] = event["special_instructions"]
     appointment["status"] = "SUMMONED"
+    appointments_table.put_item(Item=appointment)
     return appointment
