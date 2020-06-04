@@ -70,6 +70,15 @@ def submit_form_handler(event, context):
     appointments_table.put_item(Item=appointment)
     return appointment
 
+def get_appointment_forms_handler(event, context):
+    form_ids = event['form_ids']
+    forms = []
+    for form_id in form_ids:
+        form_s3_obj = s3_client.get_object(Bucket="sandbox-forms", Key=form_id, Body=json.dumps(form).encode("UTF-8"))
+        form = form_s3_obj["Body"].read()
+        forms.append(form)
+    return forms
+
 
 def summon_patient_handler(event, context):
     appointment_id = event['appointment_id']
