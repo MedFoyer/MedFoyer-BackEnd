@@ -107,9 +107,11 @@ def get_waitlist_position_handler(event, context):
     #TODO: Implement pagination, although if it's needed the waitlist is really really really long
     #TODO: Cache the waitlist somehow, so we're not doing a dynamo fetch each time
     dynamo_waitlist = appointments_table.query(IndexName='waitlist-index',
-                             KeyConditions={"clinic_location_id" : {"AttributeValueList" : [location_id],
-                                                                    "ComparisonOperator" : "EQ"},
-                                            "waitlist_priority" : {"AttributeValueList" : [priority],
-                                                                   "ComparisonOperator" : "LT"}})
-    waitlist = dynamo_waitlist["Items"]
-    return len(waitlist) + 1
+                                               KeyConditions={"clinic_location_id" : {"AttributeValueList" : [location_id],
+                                                                                      "ComparisonOperator" : "EQ"},
+                                                              "waitlist_priority" : {"AttributeValueList" : [priority],
+                                                                                     "ComparisonOperator" : "LT"}})
+    waitlist_count = dynamo_waitlist["Count"] + 1
+    return {"position" : waitlist_count,
+            #TODO: Make this value more useful
+            "expected_wait_time" : waitlist_count * 300}
