@@ -55,3 +55,13 @@ Resources:
                         Handler: handlers/appointment.summon_patient_handler
                         Runtime: python3.8
                         CodeUri: ./
+        GetWaitlistPriority:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-get-waitlist-position"
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                        Handler: handlers/appointment.get_waitlist_position_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+

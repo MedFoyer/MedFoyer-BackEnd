@@ -41,6 +41,7 @@ def check_in_handler(event, context):
     appointment["check_in_latitude"] = event["latitude"]
     appointment["check_in_longitude"] = event["longitude"]
     appointment["check_in_time"] = int(time.time() * 1000)
+    appointment["waitlist_priority"] = appointment["check_in_time"]
     #TODO String sanitzation
     #TODO Synchronization for multiple writes
     appointments_table.put_item(Item=appointment)
@@ -88,5 +89,27 @@ def summon_patient_handler(event, context):
     if "special_instructions" in event:
         appointment["special_instructions"] = event["special_instructions"]
     appointment["status"] = "SUMMONED"
+    del appointment["waitlist_priority"]
     appointments_table.put_item(Item=appointment)
     return appointment
+
+def get_waitlist_position_handler(event, context):
+    appointment_id = event['appointment_id']
+    appointment = get_appointment(appointment_id)
+    if not appointment:
+        return ("Appointment not found.", 404)
+    status = appointment["status"]
+    if status != "CHECKED_IN":
+        raise RuntimeError("Appointment not CHECKED_IN, can't check waitlist status.")
+    location_id = appointment['clinic_location_id']
+    priority = appointment['waitlist_priority']
+
+    #TODO: Implement pagination, although if it's needed the waitlist is really really really long
+    #TODO: Cache the waitlist somehow, so we're not doing a dynamo fetch each time
+    dynamo_waitlist = appointments_table.query(IndexName='waitlist-index',
+                             KeyConditions={"clinic_location_id" : {"AttributeValueList" : [location_id],
+                                                                    "ComparisonOperator" : "EQ"},
+                                            "waitlist_priority" : {"AttributeValueList" : [priority],
+                                                                   "ComparisonOperator" : "LT"}})
+    waitlist = dynamo_waitlist["Items"]
+    return len(waitlist) + 1
