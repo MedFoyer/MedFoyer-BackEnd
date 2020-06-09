@@ -71,10 +71,10 @@ def submit_form_handler(event, context):
     return appointment
 
 def get_forms_handler(event, context):
-    form_ids = event['form_ids']
+    forms_metadata = event.get('submitted_form_metadata', [])
     forms = []
-    for form_id in form_ids:
-        form_s3_obj = s3_client.get_object(Bucket="sandbox-forms", Key=form_id, Body=json.dumps(form).encode("UTF-8"))
+    for form_metadata in forms_metadata:
+        form_s3_obj = s3_client.get_object(Bucket="sandbox-forms", Key=form_metadata["form_id"])
         form = form_s3_obj["Body"].read()
         forms.append(form)
     return forms
