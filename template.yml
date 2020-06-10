@@ -71,4 +71,11 @@ Resources:
                         Handler: handlers/auth.claim_add_handler
                         Runtime: python3.8
                         CodeUri: ./
+        NotifyUserForAppointment:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-notify-user-for-appointment"
+                        Handler: handlers/integrations/twilio.notify_for_appointment
+                        Runtime: python3.8
+                        CodeUri: ./
 
