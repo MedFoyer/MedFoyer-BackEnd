@@ -9,12 +9,18 @@ dynamodb = boto3.resource('dynamodb')
 appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
 clinics_table = dynamodb.Table('SANDBOX_CLINICS')
 clinic_locations_table = dynamodb.Table('SANDBOX_CLINIC_LOCATIONS')
+patients_table = dynamodb.Table('SANDBOX_PATIENTS')
 s3_client = boto3.client('s3')
 
 def get_appointment(appointment_id):
     dynamo_response = appointments_table.get_item(Key={"appointment_id" : appointment_id})
     appointment = dynamo_response.get("Item", None)
     return appointment
+
+def get_patient(patient_id):
+    dynamo_response = patients_table.get_item(Key={"patient_id" : patient_id})
+    patient = dynamo_response.get("Item", None)
+    return patient
 
 def get_appointments(clinic_location_id, start_time, end_time):
     dynamo_response = appointments_table.query(IndexName='clinic-location-index',
@@ -150,4 +156,5 @@ def send_appointment_reminders_handler(event, context):
         appointments = get_appointments(clinic_location["clinic_location_id"], now, now + 1000 * 60 * 60 * 60)
         for appointment in appointments:
             if appointment.get("reminder_status", None) in ["NONE_SENT", "FIRST_REMINDER_SENT"]:
-                twilio.notify_for_appointment(appointment)
+                patient = get_patient(appointment["patient_id"])
+                twilio.notify_for_appointment(appointment, patient)

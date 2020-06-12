@@ -17,7 +17,7 @@ def send_message(message, destination):
     )
 
 
-def notify_for_appointment(appointment):
+def notify_for_appointment(appointment, patient):
     global twilio_client
     if not twilio_client:
         parameters = ssm_client.get_parameters(Names=["twilio_account_sid, twilio_auth_token"], WithDecryption=True)
@@ -25,7 +25,7 @@ def notify_for_appointment(appointment):
         auth_token = next((parameter for parameter in parameters if parameter["Name"] == "twilio_auth_token"))["Value"];
         twilio_client = Client(account, auth_token)
     appointment_id = appointment["id"]
-    patient_number = appointment["phone_number"]
+    patient_number = patient["phone_number"]
     send_message(
         """
 You have an upcoming appointment, and your clinic uses MedFoyer to ensure a safe and smooth check-in.
