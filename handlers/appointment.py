@@ -154,6 +154,7 @@ def send_appointment_reminders_handler(event, context):
         #TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
         #Get all appointments from now until an hour from now for check in text
         appointments = get_appointments(clinic_location["clinic_location_id"], now, now + 1000 * 60 * 60 * 60)
+        printf("Checking %d appointments", len(appointments))
         for appointment in appointments:
             if appointment.get("reminder_status", None) in ["NONE_SENT", "FIRST_REMINDER_SENT"]:
                 patient = get_patient(appointment["patient_id"])
