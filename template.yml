@@ -75,6 +75,9 @@ Resources:
                 Type: AWS::Serverless::Function
                 Properties:
                         FunctionName: !Sub "${EnvType}-send-appointment-reminders"
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
                         Handler: handlers/appointment.send_appointment_reminders_handler
                         Runtime: python3.8
                         CodeUri: ./
