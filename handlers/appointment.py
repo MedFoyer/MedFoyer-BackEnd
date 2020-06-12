@@ -2,16 +2,40 @@ import json
 import time
 import boto3
 import uuid
+from integrations import twilio
 from geopy import distance
 
 dynamodb = boto3.resource('dynamodb')
 appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
+clinics_table = dynamodb.Table('SANDBOX_CLINICS')
+clinic_locations_table = dynamodb.Table('SANDBOX_CLINIC_LOCATIONS')
 s3_client = boto3.client('s3')
 
 def get_appointment(appointment_id):
     dynamo_response = appointments_table.get_item(Key={"appointment_id" : appointment_id})
     appointment = dynamo_response.get("Item", None)
     return appointment
+
+def get_appointments(clinic_location_id, start_time, end_time):
+    dynamo_response = appointments_table.query(IndexName='clinic-location-index',
+                                               KeyConditions={"clinic_location_id" : {"AttributeValueList" : [clinic_location_id],
+                                                                                      "ComparisonOperator" : "EQ"},
+                                                              "appointment_time" : {"AttributeValueList" : [start_time, end_time],
+                                                                                     "ComparisonOperator" : "BETWEEN"}})
+    appointments = dynamo_response["Items"]
+    return appointments
+
+def get_clinics():
+    #TODO: Needs pagination (and optimization) when we start rolling in customers
+    dynamo_response = clinics_table.scan()
+    clinics = dynamo_response["Items"]
+    return clinics
+
+def get_clinic_locations():
+    #TODO: Needs pagination (and optimization) when we start rolling in customers
+    dynamo_response = clinic_locations_table.scan()
+    clinic_locations = dynamo_response["Items"]
+    return clinic_locations
 
 appointments = [{"appointment_id": "guid",
                  "name": "Brian",
@@ -115,3 +139,15 @@ def get_waitlist_position_handler(event, context):
     return {"position" : waitlist_count,
             #TODO: Make this value more useful
             "expected_wait_time" : waitlist_count * 300}
+
+def send_appointment_reminders_handler(event, context):
+    #TODO: Cache this
+    clinic_locations = get_clinic_locations()
+    now = int(time.time() * 1000)
+    for clinic_location in clinic_locations:
+        #TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
+        #Get all appointments from now until an hour from now for check in text
+        appointments = get_appointments(clinic_location["clinic_location_id"], now, now + 1000 * 60 * 60 * 60)
+        for appointment in appointments:
+            if appointment.get("reminder_status", None) in ["NONE_SENT", "FIRST_REMINDER_SENT"]:
+                twilio.notify_for_appointment(appointment)

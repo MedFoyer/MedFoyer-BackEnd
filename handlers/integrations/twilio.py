@@ -14,9 +14,10 @@ def send_message(message, destination):
     )
 
 
-def notify_for_appointment(appointment_id):
+def notify_for_appointment(appointment):
     # TODO: Get Patient Phone Number
-    patient_number = "9703104636"  # Brian's number for now
+    appointment_id = appointment["id"]
+    patient_number = appointment["phone_number"]
     send_message(
         """
 You have an upcoming appointment, and your clinic uses MedFoyer to ensure a safe and smooth check-in.
