@@ -2,7 +2,7 @@ import json
 import time
 import boto3
 import uuid
-from integrations import twilio
+from .integrations import twilio
 from geopy import distance
 
 dynamodb = boto3.resource('dynamodb')
