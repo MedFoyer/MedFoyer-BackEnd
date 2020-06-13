@@ -57,7 +57,7 @@ def auth_appointment_handler(event, context):
             dynamo.put_token(token)
             return {"statusCode" : 200,
                     "body" : json.dumps(jwt_token)}
-        token["failed_attempts"]+= 1
+        token["failed_attempts"] = token["failed_attempts"] + 1
         dynamo.put_token(token)
     #We're using the same message for both missing token and unable to find token.  Could eventually split them out,
     #but better to be safe on protecting against scrapes for now.
