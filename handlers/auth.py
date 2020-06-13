@@ -3,6 +3,7 @@ import jwt
 import db.dynamo
 import time
 import uuid
+import json
 
 dynamodb = boto3.resource('dynamodb')
 appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
@@ -25,13 +26,16 @@ def claim_add_handler(event, context):
 def auth_appointment_handler(event, context):
     print("EVENT:" + str(event))
     print("CONTEXT" + str(context))
-    requested_token = event["body"]["token"]
-    birthday_assertion = event["body"]["birthday"]
+    body = json.loads(event["body"])
+    requested_token = body.get("token", None)
+    birthday_assertion = body.get("birthday", None)
+    if not requested_token or not birthday_assertion:
+        return {statusCode: 400}
     token = dynamo.get_token(requested_token)
     if token:
         if token["failed_attempts"] >= 5:
             return {statusCode: 403,
-                    body: "Too many failed attempts, please call your clinic to check in."}
+                    body: JSON.dump("Too many failed attempts, please call your clinic to check in.")}
         appointment_id = token["appointment_id"]
         patient = dynamo.get_patient(token["patient_id"])
         birthday = patient["birthday"]
@@ -52,12 +56,12 @@ def auth_appointment_handler(event, context):
             token["failed_attempts"] = 0
             dynamo.put_token(token)
             return {statusCode: 200,
-                    body: jwt_token}
+                    body: JSON.dump(jwt_token)}
         token["failed_attempts"]+= 1
         dynamo.put_token(token)
     #We're using the same message for both missing token and unable to find token.  Could eventually split them out,
     #but better to be safe on protecting against scrapes for now.
     return {statusCode: 403,
-            body: "Authentication Failed."}
+            body: JSON.dump("Authentication Failed.")}
 
 
