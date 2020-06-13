@@ -30,12 +30,12 @@ def auth_appointment_handler(event, context):
     requested_token = body.get("token", None)
     birthday_assertion = body.get("birthday", None)
     if not requested_token or not birthday_assertion:
-        return {statusCode: 400}
+        return {"statusCode" : 400}
     token = dynamo.get_token(requested_token)
     if token:
         if token["failed_attempts"] >= 5:
-            return {statusCode: 403,
-                    body: JSON.dump("Too many failed attempts, please call your clinic to check in.")}
+            return {"statusCode" : 403,
+                    "body" : JSON.dump("Too many failed attempts, please call your clinic to check in.")}
         appointment_id = token["appointment_id"]
         patient = dynamo.get_patient(token["patient_id"])
         birthday = patient["birthday"]
@@ -55,13 +55,13 @@ def auth_appointment_handler(event, context):
                        algorithms=["HS256"])
             token["failed_attempts"] = 0
             dynamo.put_token(token)
-            return {statusCode: 200,
-                    body: JSON.dump(jwt_token)}
+            return {"statusCode" : 200,
+                    "body" : JSON.dump(jwt_token)}
         token["failed_attempts"]+= 1
         dynamo.put_token(token)
     #We're using the same message for both missing token and unable to find token.  Could eventually split them out,
     #but better to be safe on protecting against scrapes for now.
-    return {statusCode: 403,
-            body: JSON.dump("Authentication Failed.")}
+    return {"statusCode" : 403,
+            "body" : JSON.dump("Authentication Failed.")}
 
 
