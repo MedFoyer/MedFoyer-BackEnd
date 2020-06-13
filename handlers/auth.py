@@ -25,8 +25,8 @@ def claim_add_handler(event, context):
 def auth_appointment_handler(event, context):
     print("EVENT:" + str(event))
     print("CONTEXT" + str(context))
-    requested_token = event["token"]
-    birthday_assertion = event["birthday"]
+    requested_token = event["body"]["token"]
+    birthday_assertion = event["body"]["birthday"]
     token = dynamo.get_token(requested_token)
     if token:
         if token["failed_attempts"] >= 5:
