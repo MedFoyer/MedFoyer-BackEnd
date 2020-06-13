@@ -1,6 +1,6 @@
 import boto3
 import jwt
-import db.dynamo
+import db.dynamo as dynamo
 import time
 import uuid
 import json
