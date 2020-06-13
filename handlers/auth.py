@@ -43,7 +43,7 @@ def auth_appointment_handler(event, context):
             global hsa_key
             if not hsa_key:
                 parameter = ssm_client.get_parameter(Name="sandbox_patient_jwt_hsa_key", WithDecryption=True)
-                hsa_key = parameter["Value"]
+                hsa_key = parameter["Parameter"]["Value"]
             #expire 4 hour after now
             expiration = int(time.time() / 1000 / 1000) + 60 * 60 * 4
             auth_session = str(uuid.uuid4())
