@@ -99,7 +99,7 @@ Resources:
                                 AuthAppointmentApi:
                                         Type: Api
                                         Properties:
-                                                ApiId: !Ref PatientApi
+                                                RestApiId: !Ref PatientApi
                                                 Path: /AuthAppointment
                                                 Method: POST
 
