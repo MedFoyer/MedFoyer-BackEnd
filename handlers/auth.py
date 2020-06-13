@@ -52,7 +52,7 @@ def auth_appointment_handler(event, context):
                         "appointment_id" : appointment_id,
                         "session_id" : auth_session},
                        key = hsa_key,
-                       algorithms=["HS256"])
+                       algorithm="HS256")
             token["failed_attempts"] = 0
             dynamo.put_token(token)
             return {"statusCode" : 200,
