@@ -19,7 +19,7 @@ def get_token(token_id):
     return token
 
 def put_token(token):
-    patients_table.put_item(token)
+    patients_table.put_item(Item=token)
 
 def get_patient(patient_id):
     dynamo_response = patients_table.get_item(Key={"patient_id" : patient_id})
