@@ -28,8 +28,8 @@ def auth_appointment_handler(event, context):
     print("CONTEXT" + str(context))
     body = json.loads(event["body"])
     requested_token = body.get("token", None)
-    birthday_assertion = body.get("birthday", None)
-    if not requested_token or not birthday_assertion:
+    birth_date_assertion = body.get("birth_date", None)
+    if not requested_token or not birth_date_assertion:
         return {"statusCode" : 400}
     token = dynamo.get_token(requested_token)
     if token:
@@ -38,8 +38,8 @@ def auth_appointment_handler(event, context):
                     "body" : json.dumps("Too many failed attempts, please call your clinic to check in.")}
         appointment_id = token["appointment_id"]
         patient = dynamo.get_patient(token["patient_id"])
-        birthday = patient["birthday"]
-        if birthday_assertion is birthday:
+        birth_date = patient["birth_date"]
+        if birth_date_assertion is birth_date:
             global hsa_key
             if not hsa_key:
                 parameter = ssm_client.get_parameter(Name="sandbox_patient_jwt_hsa_key", WithDecryption=True)
