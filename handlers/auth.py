@@ -23,8 +23,8 @@ def claim_add_handler(event, context):
     return event
 
 def auth_appointment_handler(event, context):
-    print("EVENT:" + event)
-    print("CONTEXT" + context)
+    print("EVENT:" + str(event))
+    print("CONTEXT" + str(context))
     requested_token = event["token"]
     birthday_assertion = event["birthday"]
     token = dynamo.get_token(requested_token)
