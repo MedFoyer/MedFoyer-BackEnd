@@ -39,7 +39,7 @@ def auth_appointment_handler(event, context):
         appointment_id = token["appointment_id"]
         patient = dynamo.get_patient(token["patient_id"])
         birth_date = patient["birth_date"]
-        if birth_date_assertion is birth_date:
+        if birth_date_assertion == birth_date:
             global hsa_key
             if not hsa_key:
                 parameter = ssm_client.get_parameter(Name="sandbox_patient_jwt_hsa_key", WithDecryption=True)
