@@ -31,7 +31,7 @@ def handler(event, context):
 
 
 def check_in_handler(event, context):
-    jwt_token = event["headers"]["X-Authorization"]
+    jwt_token = event["headers"]["x-auth-token"]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     body = json.loads(event["body"])
     check_in_latitude = body["latitude"]
@@ -60,7 +60,7 @@ true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
 
 
 def submit_form_handler(event, context):
-    jwt_token = event["headers"]["X-Authorization"]
+    jwt_token = event["headers"]["x-auth-token"]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     body = json.loads(event["body"])
     form = json.loads(body["form"])
@@ -108,7 +108,7 @@ def summon_patient_handler(event, context):
 
 
 def get_waitlist_position_handler(event, context):
-    jwt_token = event["headers"]["X-Authorization"]
+    jwt_token = event["headers"]["x-auth-token"]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     appointment = dynamo.get_appointment(appointment_id)
     if not appointment:
