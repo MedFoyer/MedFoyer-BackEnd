@@ -6,17 +6,19 @@ import uuid
 import json
 import auth.patient as patient_auth
 
-#This function is used by Cognito to add the clinic ID to the JWT claims
+
+# This function is used by Cognito to add the clinic ID to the JWT claims
 def claim_add_handler(event, context):
     attributes = event["request"]["userAttributes"]
     clinic_id = attributes.get("custom:clinic_ident", None)
     if clinic_id:
         event["response"]["claimsOverrideDetails"] = {
-            "claimsToAddOrOverride" : {
+            "claimsToAddOrOverride": {
                 "clinic_id": clinic_id
             }
         }
     return event
+
 
 def auth_appointment_handler(event, context):
     body = json.loads(event["body"])
@@ -53,8 +55,8 @@ def auth_appointment_handler(event, context):
                     }}
         token["failed_attempts"] = token["failed_attempts"] + 1
         dynamo.put_token(token)
-    #We're using the same message for both missing token and unable to find token.  Could eventually split them out,
-    #but better to be safe on protecting against scrapes for now.
+    # We're using the same message for both missing token and unable to find token.  Could eventually split them out,
+    # but better to be safe on protecting against scrapes for now.
     return {"statusCode": 403,
             "body": json.dumps("Authentication Failed."),
             "headers": {
