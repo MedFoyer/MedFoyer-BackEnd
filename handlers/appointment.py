@@ -56,7 +56,7 @@ def check_in_handler(event, context):
     # TODO Synchronization for multiple writes
     appointments_table.put_item(Item=appointment)
     return {"statusCode":200,
-            "body":{"status": "FILLING_FORMS"}}
+            "body": json.dumps({"status": "FILLING_FORMS"})}
 
 
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
@@ -85,7 +85,7 @@ def submit_form_handler(event, context):
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
     return {"statusCode":200,
-            "body":{"status": "FILLING_FORMS"}}
+            "body": json.dumps({"status": "FILLING_FORMS"})}
 
 
 def get_forms_handler(event, context):
@@ -132,9 +132,10 @@ def get_waitlist_position_handler(event, context):
                                                    "waitlist_priority": {"AttributeValueList": [priority],
                                                                          "ComparisonOperator": "LT"}})
     waitlist_count = dynamo_waitlist["Count"] + 1
-    return {"position": waitlist_count,
-            # TODO: Make this value more useful
-            "expected_wait_time": waitlist_count * 300}
+    return {"statusCode": 200,
+            "body" : json.dumps({"position": waitlist_count,
+                                # TODO: Make this value more useful
+                                "expected_wait_time": waitlist_count * 300})}
 
 
 def send_appointment_reminders_handler(event, context):
