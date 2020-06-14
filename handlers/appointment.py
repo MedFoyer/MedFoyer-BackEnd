@@ -6,6 +6,7 @@ import handlers.integrations.twilio as twilio
 from geopy import distance
 import db.dynamo as dynamo
 import auth.patient as patient_auth
+from decimal import Decimal
 
 dynamodb = boto3.resource('dynamodb')
 appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
@@ -47,8 +48,8 @@ def check_in_handler(event, context):
     if dist > 1:
         raise RuntimeError("Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
     appointment["status"] = "FILLING_FORMS"
-    appointment["check_in_latitude"] = check_in_latitude
-    appointment["check_in_longitude"] = check_in_longitude
+    appointment["check_in_latitude"] = Decimal(check_in_latitude)
+    appointment["check_in_longitude"] = Decimal(check_in_longitude)
     appointment["check_in_time"] = int(time.time() * 1000)
     appointment["waitlist_priority"] = appointment["check_in_time"]
     # TODO String sanitzation
