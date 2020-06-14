@@ -1,6 +1,7 @@
 import jwt
 import uuid
 import time
+import boto3
 
 ssm_client = boto3.client('ssm')
 hsa_key = None
