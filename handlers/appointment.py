@@ -148,6 +148,7 @@ def get_clinic_lat_long_handler(event, context):
             "body": json.dumps(return_body),
             "headers": {
                 "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Origin": "*"
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
                 }
             }
