@@ -20,7 +20,7 @@ Resources:
                                 AllowMethods: "'POST, GET'"
                                 AllowHeaders: "'X-Forwarded-For'"
                                 AllowOrigin: "'*'"
-                                AllowCredentials: True
+                                AllowCredentials: False
         GetAppointment:
                 Type: AWS::Serverless::Function
                 Properties:
