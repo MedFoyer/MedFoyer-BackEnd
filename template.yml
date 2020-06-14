@@ -18,7 +18,7 @@ Resources:
                         StageName: !Ref EnvType
                         Cors:
                                 AllowMethods: "'POST, GET, OPTIONS'"
-                                AllowHeaders: "'X-Forwarded-For,X-Auth-Token'"
+                                AllowHeaders: "'X-Forwarded-For,X-Auth-Token,Content-Type,Accept'"
                                 AllowOrigin: "'*'"
                                 AllowCredentials: False
         GetAppointment:
