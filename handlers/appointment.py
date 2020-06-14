@@ -159,7 +159,7 @@ def send_appointment_reminders_handler(event, context):
     clinic_locations = dynamo.get_clinic_locations()
     now = int(time.time() * 1000)
     end_time = now + 1000 * 60 * 60 * 3
-    print("Checking appointments between %d and %d".format(now, end_time))
+    print("Checking appointments between {} and {}".format(now, end_time))
     for clinic_location in clinic_locations:
         # TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
         # Get all appointments from now until an hour from now for check in text
