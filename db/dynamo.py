@@ -13,6 +13,11 @@ def get_appointment(appointment_id):
     appointment = dynamo_response.get("Item", None)
     return appointment
 
+def get_clinic_location(clinic_location_id):
+    dynamo_response = clinic_locations_table.get_item(Key={"clinic_location_id" : clinic_location_id})
+    clinic_location = dynamo_response.get("Item", None)
+    return clinic_location
+
 def get_token(token_id):
     dynamo_response = tokens_table.get_item(Key={"token_id" : token_id})
     token = dynamo_response.get("Item", None)

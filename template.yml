@@ -31,6 +31,13 @@ Resources:
                         Handler: handlers/appointment.check_in_handler
                         Runtime: python3.8
                         CodeUri: ./
+                        Events:
+                                CheckInAppointmentApi:
+                                        Type: Api
+                                        Properties:
+                                                RestApiId: !Ref PatientApi
+                                                Path: /CheckInAppointment
+                                                Method: POST
         SubmitAppointmentForm:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -41,6 +48,13 @@ Resources:
                         Handler: handlers/appointment.submit_form_handler
                         Runtime: python3.8
                         CodeUri: ./
+                        Events:
+                                SubmitAppointmentApi:
+                                        Type: Api
+                                        Properties:
+                                                RestApiId: !Ref PatientApi
+                                                Path: /SubmitAppointmentForm
+                                                Method: POST
         GetForms:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -68,6 +82,13 @@ Resources:
                         Handler: handlers/appointment.get_waitlist_position_handler
                         Runtime: python3.8
                         CodeUri: ./
+                        Events:
+                                GetWaitlistPriorityApi:
+                                        Type: Api
+                                        Properties:
+                                                RestApiId: !Ref PatientApi
+                                                Path: /Waitlist
+                                                Method: GET
         AddUserClaims:
                 Type: AWS::Serverless::Function
                 Properties:

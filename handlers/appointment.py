@@ -29,12 +29,15 @@ def handler(event, context):
     return appointment
 
 def check_in_handler(event, context):
-    appointment_id = event['appointment_id']
+    jwt_token = event["headers"]["Authorization"]
+    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
+    body = json.loads(event["body"])
+    patient_location = (body["latitude"], body["longitude"])
     appointment = dynamo.get_appointment(appointment_id)
+    clinic_location = dynamo.get_clinic_location[appointment["clinic_location_id"]]
+    dr_location = (clinic_location["latitude"], clinic_location["longitude"])
     if not appointment:
         raise RuntimeError("Appointment not found.")
-    patient_location = (event["latitude"], event["longitude"])
-    dr_location = (appointment["latitude"], appointment["longitude"])
     dist = distance.distance(patient_location, dr_location).km
     if dist > 1:
         raise RuntimeError("Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
@@ -52,8 +55,10 @@ def check_in_handler(event, context):
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
 
 def submit_form_handler(event, context):
-    appointment_id = event['appointment_id']
-    form = json.loads(event["form"])
+    jwt_token = event["headers"]["Authorization"]
+    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
+    body = json.loads(event["body"])
+    form = json.loads(body["form"])
     appointment = dynamo.get_appointment(appointment_id)
     form_id = str(uuid.uuid4())
     s3_client.put_object(Bucket="sandbox-forms", Key=form_id, Body=json.dumps(form).encode("UTF-8"))
