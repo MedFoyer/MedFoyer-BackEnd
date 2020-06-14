@@ -123,5 +123,23 @@ Resources:
                                                 RestApiId: !Ref PatientApi
                                                 Path: /AuthAppointment
                                                 Method: POST
+        GetClinicLatLong:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-get-clinic-lat-long-handler"
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+                        Handler: handlers/appointment.get_clinic_lat_long_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Events:
+                                GetClinicLatLongApi:
+                                        Type: Api
+                                        Properties:
+                                                RestApiId: !Ref PatientApi
+                                                Path: /ClincLocation
+                                                Method: GET
+
 
 

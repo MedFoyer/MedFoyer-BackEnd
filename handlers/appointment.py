@@ -136,3 +136,13 @@ def send_appointment_reminders_handler(event, context):
             if appointment.get("reminder_status", None) in ["NONE_SENT", "FIRST_REMINDER_SENT"]:
                 patient = dynamo.get_patient(appointment["patient_id"])
                 twilio.notify_for_appointment(appointment, patient)
+
+def get_clinic_lat_long_handler(event, context):
+    jwt_token = event["headers"]["Authorization"]
+    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
+    body = json.loads(event["body"])
+    clinic_location = dynamo.get_clinic_location(appointment_id)
+    return_body = {"latitude": clinic_location["latitude"],
+                   "longitude": clinic_location["longitude"]}
+    return {"statusCode": 200,
+            "body": json.dumps(return_body)}
