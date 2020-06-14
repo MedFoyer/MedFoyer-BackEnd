@@ -147,7 +147,7 @@ def get_clinic_lat_long_handler(event, context):
     return {"statusCode": 200,
             "body": json.dumps(return_body),
             "headers": {
-                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Credentials": "true",
                 }
