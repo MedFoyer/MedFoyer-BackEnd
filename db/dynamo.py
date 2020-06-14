@@ -48,6 +48,9 @@ def get_appointments(clinic_location_id, start_time, end_time):
     appointments = dynamo_response["Items"]
     return appointments
 
+def put_appointment(appointment):
+    appointments_table.put_item(Item=appointment)
+
 
 def get_clinics():
     # TODO: Needs pagination (and optimization) when we start rolling in customers

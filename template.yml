@@ -115,6 +115,14 @@ Resources:
                         Handler: handlers/appointment.send_appointment_reminders_handler
                         Runtime: python3.8
                         CodeUri: ./
+                        Events:
+                                SendAppointmentRemindersSchedule:
+                                        Type: Schedule
+                                        Properties:
+                                                Schedule: 'rate(1 minute)'
+                                                Name: !Sub "${EnvType}-send-appointment-reminders-schedule"
+                                                Description: Schedule to send needed text messages
+                                                Enabled: True
         AuthAppointment:
                 Type: AWS::Serverless::Function
                 Properties:
