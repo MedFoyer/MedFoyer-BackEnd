@@ -15,7 +15,28 @@ Resources:
         PatientApi:
                 Type: AWS::Serverless::Api
                 Properties:
-                        StageName: !Ref EnvType
+                        StageNa￼
+Stage Variables
+No stage variables exist for this method.
+
+Client Certificate
+No client certificates have been generated.
+
+Request Body
+Request Body is not supported for GET methods.
+
+￼ Test
+Request: /ClincLocation
+Status: 502
+Latency: 759 ms
+Response Body
+{
+  "message": "Internal server error"
+}
+Response Headers
+{"x-amzn-ErrorType":"InternalServerErrorException"}
+Logs
+me: !Ref EnvType
                         Cors:
                                 AllowMethods: "'POST, GET, OPTIONS'"
                                 AllowHeaders: "'X-Forwarded-For'"
@@ -32,7 +53,9 @@ Resources:
                 Type: AWS::Serverless::Function
                 Properties:
                         FunctionName: !Sub "${EnvType}-check-in-appointment"
-                        Policies: AmazonDynamoDBFullAccess
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
                         Handler: handlers/appointment.check_in_handler
                         Runtime: python3.8
                         CodeUri: ./
@@ -50,6 +73,7 @@ Resources:
                         Policies:
                                 - AmazonDynamoDBFullAccess
                                 - AmazonS3FullAccess
+                                - AmazonSSMReadOnlyAccess
                         Handler: handlers/appointment.submit_form_handler
                         Runtime: python3.8
                         CodeUri: ./
@@ -84,6 +108,7 @@ Resources:
                         FunctionName: !Sub "${EnvType}-get-waitlist-position"
                         Policies:
                                 - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
                         Handler: handlers/appointment.get_waitlist_position_handler
                         Runtime: python3.8
                         CodeUri: ./
