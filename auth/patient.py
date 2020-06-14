@@ -27,5 +27,8 @@ def create_jwt_token(appointment_id):
                             "appointment_id": appointment_id,
                             "session_id": auth_session},
                            key=str(hsa_key),
-                           algorithm="HS256")
+                           algorithm="HS256",
+                           headers={
+                               "alg": "HS256"
+                           })
     return jwt_token
