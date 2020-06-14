@@ -26,6 +26,6 @@ def create_jwt_token(appointment_id):
     jwt_token = jwt.encode({"exp": expiration,
                             "appointment_id": appointment_id,
                             "session_id": auth_session},
-                           key=hsa_key,
+                           key=str(hsa_key),
                            algorithm="HS256")
     return jwt_token
