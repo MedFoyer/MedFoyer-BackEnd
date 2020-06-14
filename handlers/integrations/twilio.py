@@ -20,7 +20,7 @@ def send_message(message, destination):
 def notify_for_appointment(appointment, patient):
     global twilio_client
     if not twilio_client:
-        ssm_response = ssm_client.get_parameters(Names=["twilio_account_sid, twilio_auth_token"], WithDecryption=True)
+        ssm_response = ssm_client.get_parameters(Names=["twilio_account_sid", "twilio_auth_token"], WithDecryption=True)
         parameters = ssm_response["Parameters"]
         account = next((parameter for parameter in parameters if parameter["Name"] == "twilio_account_sid"))["Value"];
         auth_token = next((parameter for parameter in parameters if parameter["Name"] == "twilio_auth_token"))["Value"];
