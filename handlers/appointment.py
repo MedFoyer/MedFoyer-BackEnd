@@ -91,7 +91,7 @@ def submit_form_handler(event, context):
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
     return {"statusCode": 200,
-            "body": json.dumps({"status": "CHECKED_IN"}),
+            "body": json.dumps({"status": "CHECKED_IN", "covid_flag": covid_flag}),
             "headers": {
                 "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
                 "Access-Control-Allow-Origin": "*",
