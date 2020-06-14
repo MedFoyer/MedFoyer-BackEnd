@@ -53,7 +53,8 @@ def check_in_handler(event, context):
     # TODO String sanitzation
     # TODO Synchronization for multiple writes
     appointments_table.put_item(Item=appointment)
-    return appointment
+    return {"statusCode":200,
+            "body":{"status": "FILLING_FORMS"}}
 
 
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
