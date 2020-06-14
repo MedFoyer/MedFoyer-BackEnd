@@ -70,7 +70,8 @@ def submit_form_handler(event, context):
     form_id = str(uuid.uuid4())
     s3_client.put_object(Bucket="sandbox-forms", Key=form_id, Body=json.dumps(form).encode("UTF-8"))
     if not appointment:
-        return ("Appointment not found.", 404)
+        return {"statusCode": 404,
+                "body": json.dumps("Appointment not found.", 404)}
     covid_flag = "NORMAL"
     for question in form:
         if question.get("value", None) in true_values:
@@ -84,7 +85,7 @@ def submit_form_handler(event, context):
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
     return {"statusCode":200,
-            "body": json.dumps({"status": "FILLING_FORMS"})}
+            "body": json.dumps({"status": "CHECKED_IN"})}
 
 
 def get_forms_handler(event, context):
