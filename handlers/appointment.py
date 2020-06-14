@@ -34,7 +34,9 @@ def check_in_handler(event, context):
     jwt_token = event["headers"]["X-Authorization"]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     body = json.loads(event["body"])
-    patient_location = (body["latitude"], body["longitude"])
+    check_in_latitude = body["latitude"]
+    check_in_longitude = body["longitude"]
+    patient_location = (check_in_latitude, check_in_longitude)
     appointment = dynamo.get_appointment(appointment_id)
     clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"])
     dr_location = (clinic_location["latitude"], clinic_location["longitude"])
@@ -44,8 +46,8 @@ def check_in_handler(event, context):
     if dist > 1:
         raise RuntimeError("Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
     appointment["status"] = "FILLING_FORMS"
-    appointment["check_in_latitude"] = event["latitude"]
-    appointment["check_in_longitude"] = event["longitude"]
+    appointment["check_in_latitude"] = check_in_latitude
+    appointment["check_in_longitude"] = check_in_longitude
     appointment["check_in_time"] = int(time.time() * 1000)
     appointment["waitlist_priority"] = appointment["check_in_time"]
     # TODO String sanitzation
