@@ -147,7 +147,7 @@ Resources:
                                         Type: Api
                                         Properties:
                                                 RestApiId: !Ref PatientApi
-                                                Path: /ClincLocation
+                                                Path: /ClinicLocation
                                                 Method: GET
 
 

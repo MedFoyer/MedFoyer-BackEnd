@@ -157,7 +157,7 @@ def get_clinic_lat_long_handler(event, context):
             "body": json.dumps(return_body),
             "headers": {
                 "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                "Access-Control-Allow-Origin": "http://local.medfoyer.com:5000",
+                "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Credentials": "true",
             }
             }
