@@ -139,6 +139,8 @@ def send_appointment_reminders_handler(event, context):
 
 def get_clinic_lat_long_handler(event, context):
     jwt_token = event["headers"]["Authorization"]
+    print(jwt_token)
+    print(event["headers"])
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     body = json.loads(event["body"])
     clinic_location = dynamo.get_clinic_location(appointment_id)

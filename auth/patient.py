@@ -14,7 +14,7 @@ def get_hsa_key():
     return hsa_key
 
 def get_appointment_verify_id(jwt_token):
-    decoded_token = jwt.decode(jwt_token, get_hsa_key(), algorithms=["HS256"])
+    decoded_token = jwt.decode(jwt_token, str(get_hsa_key()), algorithms=["HS256"])
     print("Verified token with session %s and appointment id %s", decoded_token["session_id"], decoded_token["appointment_id"])
     return decoded_token["appointment_id"]
 
@@ -26,7 +26,7 @@ def create_jwt_token(appointment_id):
     jwt_token = jwt.encode({"exp": expiration,
                             "appointment_id": appointment_id,
                             "session_id": auth_session},
-                           key=str(hsa_key),
+                           key=str(get_hsa_key()),
                            algorithm="HS256",
                            headers={
                                "alg": "HS256"
