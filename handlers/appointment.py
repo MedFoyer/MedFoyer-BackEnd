@@ -5,6 +5,7 @@ import uuid
 import handlers.integrations.twilio
 from geopy import distance
 import db.dynamo
+import auth.patient as patient_auth
 
 dynamodb = boto3.resource('dynamodb')
 appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
@@ -94,7 +95,8 @@ def summon_patient_handler(event, context):
     return appointment
 
 def get_waitlist_position_handler(event, context):
-    appointment_id = event['appointment_id']
+    jwt_token = event["headers"]["Authorization"]
+    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     appointment = dynamo.get_appointment(appointment_id)
     if not appointment:
         return ("Appointment not found.", 404)
