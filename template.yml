@@ -15,28 +15,7 @@ Resources:
         PatientApi:
                 Type: AWS::Serverless::Api
                 Properties:
-                        StageNa￼
-Stage Variables
-No stage variables exist for this method.
-
-Client Certificate
-No client certificates have been generated.
-
-Request Body
-Request Body is not supported for GET methods.
-
-￼ Test
-Request: /ClincLocation
-Status: 502
-Latency: 759 ms
-Response Body
-{
-  "message": "Internal server error"
-}
-Response Headers
-{"x-amzn-ErrorType":"InternalServerErrorException"}
-Logs
-me: !Ref EnvType
+                        StageName: !Ref EnvType
                         Cors:
                                 AllowMethods: "'POST, GET, OPTIONS'"
                                 AllowHeaders: "'X-Forwarded-For'"
