@@ -15,8 +15,9 @@ def get_appointment(appointment_id):
     return appointment
 
 
-def get_clinic_location(clinic_location_id):
-    dynamo_response = clinic_locations_table.get_item(Key={"clinic_location_id": clinic_location_id})
+def get_clinic_location(clinic_id, clinic_location_id):
+    dynamo_response = clinic_locations_table.get_item(Key={"clinic_id": clinic_id,
+                                                           "clinic_location_id": clinic_location_id})
     clinic_location = dynamo_response.get("Item", None)
     return clinic_location
 
