@@ -36,7 +36,7 @@ def check_in_handler(event, context):
     body = json.loads(event["body"])
     patient_location = (body["latitude"], body["longitude"])
     appointment = dynamo.get_appointment(appointment_id)
-    clinic_location = dynamo.get_clinic_location[appointment["clinic_id"], appointment["clinic_location_id"]]
+    clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"]]
     dr_location = (clinic_location["latitude"], clinic_location["longitude"])
     if not appointment:
         raise RuntimeError("Appointment not found.")
