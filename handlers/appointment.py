@@ -6,6 +6,7 @@ import handlers.integrations.twilio as twilio
 from geopy import distance
 import db.dynamo as dynamo
 import auth.patient as patient_auth
+from decimal import Decimal
 
 dynamodb = boto3.resource('dynamodb')
 appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
@@ -47,15 +48,20 @@ def check_in_handler(event, context):
     if dist > 1:
         raise RuntimeError("Distance of " + str(dist) + " is greater than 1 km, check in not possible.")
     appointment["status"] = "FILLING_FORMS"
-    appointment["check_in_latitude"] = check_in_latitude
-    appointment["check_in_longitude"] = check_in_longitude
+    appointment["check_in_latitude"] = Decimal(str(check_in_latitude))
+    appointment["check_in_longitude"] = Decimal(str(check_in_longitude))
     appointment["check_in_time"] = int(time.time() * 1000)
     appointment["waitlist_priority"] = appointment["check_in_time"]
     # TODO String sanitzation
     # TODO Synchronization for multiple writes
     appointments_table.put_item(Item=appointment)
-    return {"statusCode":200,
-            "body": json.dumps({"status": "FILLING_FORMS"})}
+    return {"statusCode": 200,
+            "body": json.dumps({"status": "FILLING_FORMS"}),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }}
 
 
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
@@ -84,8 +90,13 @@ def submit_form_handler(event, context):
         {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "0"})
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
-    return {"statusCode":200,
-            "body": json.dumps({"status": "CHECKED_IN"})}
+    return {"statusCode": 200,
+            "body": json.dumps({"status": "FILLING_FORMS"}),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }}
 
 
 def get_forms_handler(event, context):
@@ -133,9 +144,14 @@ def get_waitlist_position_handler(event, context):
                                                                          "ComparisonOperator": "LT"}})
     waitlist_count = dynamo_waitlist["Count"] + 1
     return {"statusCode": 200,
-            "body" : json.dumps({"position": waitlist_count,
+            "body": json.dumps({"position": waitlist_count,
                                 # TODO: Make this value more useful
-                                "expected_wait_time": waitlist_count * 300})}
+                                "expected_wait_time": waitlist_count * 300}),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }}
 
 
 def send_appointment_reminders_handler(event, context):
