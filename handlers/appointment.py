@@ -32,6 +32,7 @@ def handler(event, context):
 
 def check_in_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"]
+    print(jwt_token)
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     body = json.loads(event["body"])
     check_in_latitude = body["latitude"]
