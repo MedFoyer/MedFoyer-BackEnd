@@ -36,7 +36,7 @@ def check_in_handler(event, context):
     body = json.loads(event["body"])
     patient_location = (body["latitude"], body["longitude"])
     appointment = dynamo.get_appointment(appointment_id)
-    clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"]]
+    clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"])
     dr_location = (clinic_location["latitude"], clinic_location["longitude"])
     if not appointment:
         raise RuntimeError("Appointment not found.")
@@ -147,6 +147,7 @@ def send_appointment_reminders_handler(event, context):
 
 
 def get_clinic_lat_long_handler(event, context):
+    print(event["headers"])
     jwt_token = event["headers"]["X-Auth-Token"].split(" ")[-1]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     appointment = dynamo.get_appointment(appointment_id)
