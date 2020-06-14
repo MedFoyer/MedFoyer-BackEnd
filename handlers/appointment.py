@@ -82,7 +82,8 @@ def submit_form_handler(event, context):
         {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "0"})
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
-    return appointment
+    return {"statusCode":200,
+            "body":{"status": "FILLING_FORMS"}}
 
 
 def get_forms_handler(event, context):
