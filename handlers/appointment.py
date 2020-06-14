@@ -55,8 +55,13 @@ def check_in_handler(event, context):
     # TODO String sanitzation
     # TODO Synchronization for multiple writes
     appointments_table.put_item(Item=appointment)
-    return {"statusCode":200,
-            "body": json.dumps({"status": "FILLING_FORMS"})}
+    return {"statusCode": 200,
+            "body": json.dumps({"status": "FILLING_FORMS"}),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }}
 
 
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
@@ -84,8 +89,13 @@ def submit_form_handler(event, context):
         {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "0"})
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
-    return {"statusCode":200,
-            "body": json.dumps({"status": "FILLING_FORMS"})}
+    return {"statusCode": 200,
+            "body": json.dumps({"status": "FILLING_FORMS"}),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }}
 
 
 def get_forms_handler(event, context):
@@ -133,9 +143,14 @@ def get_waitlist_position_handler(event, context):
                                                                          "ComparisonOperator": "LT"}})
     waitlist_count = dynamo_waitlist["Count"] + 1
     return {"statusCode": 200,
-            "body" : json.dumps({"position": waitlist_count,
+            "body": json.dumps({"position": waitlist_count,
                                 # TODO: Make this value more useful
-                                "expected_wait_time": waitlist_count * 300})}
+                                "expected_wait_time": waitlist_count * 300}),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }}
 
 
 def send_appointment_reminders_handler(event, context):
