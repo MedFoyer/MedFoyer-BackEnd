@@ -64,7 +64,7 @@ def auth_appointment_handler(event, context):
             token["failed_attempts"] = 0
             dynamo.put_token(token)
             return {"statusCode": 200,
-                    "body": json.dumps(str(jwt_token)),
+                    "body": json.dumps(jwt_token.decode("base_64")),
                     "headers": {
                         "Access-Control-Allow-Headers": "Content-Type",
                         "Access-Control-Allow-Origin": "*"
