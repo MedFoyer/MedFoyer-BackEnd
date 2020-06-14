@@ -147,7 +147,7 @@ def send_appointment_reminders_handler(event, context):
 
 
 def get_clinic_lat_long_handler(event, context):
-    jwt_token = event["headers"]["X-Authorization"].split(" ")[-1]
+    jwt_token = event["headers"]["X-Auth-Token"].split(" ")[-1]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     appointment = dynamo.get_appointment(appointment_id)
     clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"])
@@ -156,7 +156,7 @@ def get_clinic_lat_long_handler(event, context):
     return {"statusCode": 200,
             "body": json.dumps(return_body),
             "headers": {
-                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Credentials": "true",
             }
