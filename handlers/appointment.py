@@ -145,4 +145,9 @@ def get_clinic_lat_long_handler(event, context):
     return_body = {"latitude": clinic_location["latitude"],
                    "longitude": clinic_location["longitude"]}
     return {"statusCode": 200,
-            "body": json.dumps(return_body)}
+            "body": json.dumps(return_body),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Origin": "*"
+                }
+            }
