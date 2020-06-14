@@ -16,6 +16,11 @@ Resources:
                 Type: AWS::Serverless::Api
                 Properties:
                         StageName: !Ref EnvType
+                        Cors:
+                                AllowMethods: "'POST, GET'"
+                                AllowHeaders: "'X-Forwarded-For'"
+                                AllowOrigin: "'*'"
+                                AllowCredentials: True
         GetAppointment:
                 Type: AWS::Serverless::Function
                 Properties:
