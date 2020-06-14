@@ -18,7 +18,7 @@ def get_appointment_verify_id(jwt_token):
     print("Verified token with session %s and appointment id %s", decoded_token["session_id"], decoded_token["appointment_id"])
     return decoded_token["appointment_id"]
 
-def create_jwt_token(appointment_id):
+def create_jwt_token(appointment_id, clinic_id):
     issue_time = int(time.time())
     # expire 4 hour after now
     expiration = int(time.time()) + 60 * 60 * 4
@@ -27,7 +27,8 @@ def create_jwt_token(appointment_id):
     jwt_token = jwt.encode({"exp": expiration,
                             "iat": issue_time,
                             "appointment_id": appointment_id,
-                            "session_id": auth_session},
+                            "session_id": auth_session,
+                            "clinic_id": clinic_id},
                            key=str(get_hsa_key()),
                            algorithm="HS256",
                            headers={

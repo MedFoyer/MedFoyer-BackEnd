@@ -39,9 +39,10 @@ def auth_appointment_handler(event, context):
                     }}
         appointment_id = token["appointment_id"]
         patient = dynamo.get_patient(token["patient_id"])
+        clinic_id = patient["clinic_id"]
         birth_date = patient["birth_date"]
         if birth_date_assertion == birth_date:
-            jwt_token = patient_auth.create_jwt_token(appointment_id)
+            jwt_token = patient_auth.create_jwt_token(appointment_id, clinic_id)
             token["failed_attempts"] = 0
             dynamo.put_token(token)
             return {"statusCode": 200,
