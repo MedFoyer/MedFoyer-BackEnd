@@ -2,9 +2,9 @@ import json
 import time
 import boto3
 import uuid
-import handlers.integrations.twilio
+import handlers.integrations.twilio as twilio
 from geopy import distance
-import db.dynamo
+import db.dynamo as dynamo
 import auth.patient as patient_auth
 
 dynamodb = boto3.resource('dynamodb')
@@ -23,10 +23,12 @@ appointments = [{"appointment_id": "guid",
                  "long": "1",
                  }]
 
+
 def handler(event, context):
     appointment_id = event['appointment_id']
     appointment = next((ap for ap in appointments if ap["appointment_id"] == appointment_id), None);
     return appointment
+
 
 def check_in_handler(event, context):
     jwt_token = event["headers"]["Authorization"]
@@ -46,13 +48,14 @@ def check_in_handler(event, context):
     appointment["check_in_longitude"] = event["longitude"]
     appointment["check_in_time"] = int(time.time() * 1000)
     appointment["waitlist_priority"] = appointment["check_in_time"]
-    #TODO String sanitzation
-    #TODO Synchronization for multiple writes
+    # TODO String sanitzation
+    # TODO Synchronization for multiple writes
     appointments_table.put_item(Item=appointment)
     return appointment
 
 
 true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
+
 
 def submit_form_handler(event, context):
     jwt_token = event["headers"]["Authorization"]
@@ -72,10 +75,12 @@ def submit_form_handler(event, context):
     appointment["covid_flag"] = covid_flag
     if "submitted_form_metadata" not in appointment:
         appointment["submitted_form_metadata"] = []
-    appointment["submitted_form_metadata"].append({"form_id" : form_id, "form_type_id" : "COVID", "form_type_version" : "0"})
+    appointment["submitted_form_metadata"].append(
+        {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "0"})
     appointment["status"] = "CHECKED_IN"
     appointments_table.put_item(Item=appointment)
     return appointment
+
 
 def get_forms_handler(event, context):
     forms_metadata = event.get('submitted_form_metadata', [])
@@ -99,6 +104,7 @@ def summon_patient_handler(event, context):
     appointments_table.put_item(Item=appointment)
     return appointment
 
+
 def get_waitlist_position_handler(event, context):
     jwt_token = event["headers"]["Authorization"]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
@@ -111,31 +117,34 @@ def get_waitlist_position_handler(event, context):
     location_id = appointment['clinic_location_id']
     priority = appointment['waitlist_priority']
 
-    #TODO: Implement pagination, although if it's needed the waitlist is really really really long
-    #TODO: Cache the waitlist somehow, so we're not doing a dynamo fetch each time
+    # TODO: Implement pagination, although if it's needed the waitlist is really really really long
+    # TODO: Cache the waitlist somehow, so we're not doing a dynamo fetch each time
     dynamo_waitlist = appointments_table.query(IndexName='waitlist-index',
-                                               KeyConditions={"clinic_location_id" : {"AttributeValueList" : [location_id],
-                                                                                      "ComparisonOperator" : "EQ"},
-                                                              "waitlist_priority" : {"AttributeValueList" : [priority],
-                                                                                     "ComparisonOperator" : "LT"}})
+                                               KeyConditions={
+                                                   "clinic_location_id": {"AttributeValueList": [location_id],
+                                                                          "ComparisonOperator": "EQ"},
+                                                   "waitlist_priority": {"AttributeValueList": [priority],
+                                                                         "ComparisonOperator": "LT"}})
     waitlist_count = dynamo_waitlist["Count"] + 1
-    return {"position" : waitlist_count,
-            #TODO: Make this value more useful
-            "expected_wait_time" : waitlist_count * 300}
+    return {"position": waitlist_count,
+            # TODO: Make this value more useful
+            "expected_wait_time": waitlist_count * 300}
+
 
 def send_appointment_reminders_handler(event, context):
-    #TODO: Cache this
+    # TODO: Cache this
     clinic_locations = dynamo.get_clinic_locations()
     now = int(time.time() / 1000)
     for clinic_location in clinic_locations:
-        #TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
-        #Get all appointments from now until an hour from now for check in text
+        # TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
+        # Get all appointments from now until an hour from now for check in text
         appointments = dynamo.get_appointments(clinic_location["clinic_location_id"], now, now + 1000 * 60 * 60 * 60)
-        printf("Checking %d appointments", len(appointments))
+        print("Checking %d appointments" % len(appointments))
         for appointment in appointments:
             if appointment.get("reminder_status", None) in ["NONE_SENT", "FIRST_REMINDER_SENT"]:
                 patient = dynamo.get_patient(appointment["patient_id"])
                 twilio.notify_for_appointment(appointment, patient)
+
 
 def get_clinic_lat_long_handler(event, context):
     jwt_token = event["headers"]["Authorization"]
@@ -149,5 +158,5 @@ def get_clinic_lat_long_handler(event, context):
                 "Access-Control-Allow-Headers": "Content-Type, Authorization",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Credentials": "true",
-                }
+            }
             }
