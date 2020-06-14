@@ -25,7 +25,7 @@ def notify_for_appointment(appointment, patient):
         account = next((parameter for parameter in parameters if parameter["Name"] == "twilio_account_sid"))["Value"];
         auth_token = next((parameter for parameter in parameters if parameter["Name"] == "twilio_auth_token"))["Value"];
         twilio_client = Client(account, auth_token)
-    appointment_id = appointment["id"]
+    appointment_id = appointment["appointment_id"]
     patient_number = patient["phone_number"]
     send_message(
         """
