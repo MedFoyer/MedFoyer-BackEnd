@@ -595,7 +595,7 @@ Resources:
                 Type: AWS::AppSync::Resolver
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
-                        DataSourceName: !GetAtt ClinicLocationsDataSource.Name
+                        DataSourceName: !GetAtt ClinicsDataSource.Name
                         FieldName: createClinic
                         RequestMappingTemplate: |
                                 {
