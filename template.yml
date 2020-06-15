@@ -466,7 +466,7 @@ Resources:
                         FieldName: getPatient
                         RequestMappingTemplate: !Sub
                                 - !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
-                                - { id : patient_id }
+                                - id: patient_id
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
