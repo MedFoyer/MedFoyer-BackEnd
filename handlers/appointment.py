@@ -102,7 +102,7 @@ def summon_patient_handler(event, context):
     if "special_instructions" in event:
         appointment["special_instructions"] = event["special_instructions"]
     appointment["status"] = "SUMMONED"
-    del appointment["waitlist_priority"]
+    appointment.pop("waitlist_priority", None)
     patient = dynamo.get_patient(appointment["patient_id"])
     twilio.notify_for_summon(patient)
     appointments_table.put_item(Item=appointment)
