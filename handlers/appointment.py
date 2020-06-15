@@ -10,6 +10,8 @@ from decimal import Decimal
 
 s3_client = boto3.client('s3')
 
+stage = os.environ.get("STAGE", "sandbox")
+
 
 def check_in_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
@@ -53,8 +55,9 @@ def submit_form_handler(event, context):
     body = json.loads(event["body"])
     form = json.loads(body["form"])
     appointment = dynamo.get_appointment(appointment_id)
+    clinic_id = appointment["clinic_id"]
     form_id = str(uuid.uuid4())
-    s3_client.put_object(Bucket="sandbox-forms", Key=form_id, Body=json.dumps(form).encode("UTF-8"))
+    s3_client.put_object(Bucket=f"{stage}-forms", Key=f"{clinic_id}/{form_id}", Body=json.dumps(form).encode("UTF-8"))
     if not appointment:
         return {"statusCode": 404,
                 "body": json.dumps("Appointment not found.", 404)}
@@ -81,9 +84,11 @@ def submit_form_handler(event, context):
 
 def get_forms_handler(event, context):
     forms_metadata = event.get('submitted_form_metadata', [])
+    clinic_id = event["clinic_id"]
     forms = []
     for form_metadata in forms_metadata:
-        form_s3_obj = s3_client.get_object(Bucket="sandbox-forms", Key=form_metadata["form_id"])
+        form_id = form_metadata["form_id"]
+        form_s3_obj = s3_client.get_object(Bucket=f"{stage}-forms", Key=f"{clinic_id}/{form_id}")
         form = form_s3_obj["Body"].read()
         forms.append(form)
     return forms
