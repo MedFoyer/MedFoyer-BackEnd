@@ -65,6 +65,14 @@ Mappings:
                                         "expressionValues" : {":clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)}
                                     }
                                 }
+                        DynamoGenericGet: |
+                                {
+                                    "version": "2017-02-28",
+                                    "operation": "GetItem",
+                                    "key": {
+                                        "id": $util.dynamodb.toDynamoDBJson($ctx.args.id),
+                                    }
+                                }
 
                 ResponseMappings:
                         LambdaGeneric: |
@@ -357,6 +365,16 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
 
+        GetAppointmentResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt AppointmentsDataSource.Name
+                        FieldName: getAppointment
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Query
+
         DeleteAppointmentResolver:
                 Type: AWS::AppSync::Resolver
                 Properties:
@@ -462,7 +480,7 @@ Resources:
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ClinicLocationsDataSource.Name
-                        FieldName: createClinicLocation
+                        FieldName: createClinic
                         RequestMappingTemplate: |
                                 {
                                     "version" : "2017-02-28",
