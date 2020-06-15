@@ -257,9 +257,8 @@ Resources:
                                 }
                         Path: !Sub "${EnvType}/appsync/graphapi/"
                         Policies:
-                                - LambdaInvokePolicy:
-                                          PolicyName: lambda-invoke
-                                          PolicyDocument: |
+                                - PolicyName: lambda-invoke
+                                  PolicyDocument: |
                                             {
                                                     "Version": "2012-10-17",
                                                     "Statement": [
@@ -276,18 +275,17 @@ Resources:
                                                     ]
                                             }
 
-
-#        CheckInAppointmentDataSource:
+#        AppointmentDataSource:
 #                Type: AWS::AppSync::DataSource
 #                Properties:
 #                        ApiId: !GetAtt GraphApi.ApiId
 #                        LambdaConfig:
-#                                LambdaFunctionArn: !GetAtt CheckInAppointment.Arn
+#                                LambdaFunctionArn: !GetAtt SummonPatient.Arn
 #                        Name: summon_patient_lambda
 #                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
-#                        Type: AWS_LAMBDA
+#                        Type: AMAZON_DYNAMODB
 #
-#        CheckInAppointmentResolver:
+#        SummonPatientResolver:
 #                Type: AWS::AppSync::Resolver
 #                Properties:
 #                        ApiId: !GetAtt GraphApi.ApiId
@@ -296,6 +294,7 @@ Resources:
 #                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
 #                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
 #                        TypeName: Mutation
+
 
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
