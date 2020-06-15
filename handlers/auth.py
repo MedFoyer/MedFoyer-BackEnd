@@ -11,6 +11,7 @@ import auth.patient as patient_auth
 def claim_add_handler(event, context):
     attributes = event["request"]["userAttributes"]
     clinic_id = attributes.get("custom:clinic_ident", None)
+    clinic_id = attributes.get("custom:clinic_id", clinic_id)
     if clinic_id:
         event["response"]["claimsOverrideDetails"] = {
             "claimsToAddOrOverride": {
