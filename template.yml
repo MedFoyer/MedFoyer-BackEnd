@@ -413,7 +413,7 @@ Resources:
                 Type: AWS::AppSync::Resolver
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
-                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+                        DataSourceName: !GetAtt AppointmentsDataSource.Name
                         FieldName: deleteAppointment
                         RequestMappingTemplate: |
                                 #set($clinic_id = $ctx.identity.claims.clinic_id)
