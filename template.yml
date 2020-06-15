@@ -464,11 +464,41 @@ Resources:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PatientsDataSource.Name
                         FieldName: getPatient
-                        RequestMappingTemplate:
-                                !Sub
-                                - !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
+                        RequestMappingTemplate: |
+                                {
+                                    "version": "2017-02-28",
+                                    "operation": "GetItem",
+                                    "key": {
+                                        "patient_id": $util.dynamodb.toDynamoDBJson($ctx.args.patient_id),
+                                    }
+                                }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
+
+        ListPatientsResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PatientsDataSource.Name
+                        FieldName: listPatients
+                        RequestMappingTemplate: |
+                                #set( $clinic_id = $ctx.identity.claims.clinic_id )
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "Query",
+                                    "index" : "clinic-index",
+                                    "query" : {
+                                        ## Provide a query expression. **
+                                        "expression": "clinic_id = :id",
+                                        "expressionValues" : {
+                                            ":id" : $util.dynamodb.toDynamoDBJson($clinic_id)
+                                        }
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
+                        TypeName: Query
+
 
         ClinicLocationsDataSource:
                 Type: AWS::AppSync::DataSource
