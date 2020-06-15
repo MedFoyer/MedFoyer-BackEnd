@@ -692,7 +692,7 @@ Resources:
                 Type: AWS::AppSync::Resolver
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
-                        DataSourceName: !GetAtt ClinicsDataSource.Name
+                        DataSourceName: !GetAtt ClinicLocationsDataSource.Name
                         FieldName: clinic_location
                         RequestMappingTemplate: |
                                 {
@@ -717,7 +717,7 @@ Resources:
                                 	status: String!
                                 	covid_flag: String
                                 	appointment_time: AWSTimestamp!
-                                	forms: [String]
+                                	forms(dummy: String): [String]
                                 	clinic_location_id: ID!
                                 	clinic_location: ClinicLocation
                                 	patient: Patient
@@ -732,7 +732,6 @@ Resources:
                                 	status: AppointmentStatus
                                 	covid_flag: String
                                 	appointment_time: AWSTimestamp!
-                                	forms: [String]
                                 	clinic_location_id: ID!
                                 	patient_id: ID!
                                 	doctor_id: ID!
