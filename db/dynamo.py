@@ -12,9 +12,11 @@ patients_table = dynamodb.Table(f'{stage}_PATIENTS')
 s3_client = boto3.client('s3')
 
 
-def get_appointment(appointment_id):
+def get_appointment(clinic_id, appointment_id):
     dynamo_response = appointments_table.get_item(Key={"appointment_id": appointment_id}, ConsistentRead=True)
     appointment = dynamo_response.get("Item", None)
+    if appointment["clinic_id"] != clinic_id:
+        return None
     return appointment
 
 

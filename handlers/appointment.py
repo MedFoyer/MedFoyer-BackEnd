@@ -16,12 +16,14 @@ stage = os.environ.get("STAGE", "sandbox")
 def check_in_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
     print(jwt_token)
-    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
+    decoded_token = patient_auth.get_token_verify_id(jwt_token)
+    appointment_id = decoded_token["appointment_id"]
+    clinic_id = decoded_token["clinic_id"]
     body = json.loads(event["body"])
     check_in_latitude = body["latitude"]
     check_in_longitude = body["longitude"]
     patient_location = (check_in_latitude, check_in_longitude)
-    appointment = dynamo.get_appointment(appointment_id)
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
     clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"])
     dr_location = (clinic_location["latitude"], clinic_location["longitude"])
     if not appointment:
@@ -51,10 +53,12 @@ true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
 
 def submit_form_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
-    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
+    decoded_token = patient_auth.get_token_verify_id(jwt_token)
+    appointment_id = decoded_token["appointment_id"]
+    clinic_id = decoded_token["clinic_id"]
     body = json.loads(event["body"])
     form = json.loads(body["form"])
-    appointment = dynamo.get_appointment(appointment_id)
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
     clinic_id = appointment["clinic_id"]
     form_id = str(uuid.uuid4())
     s3_client.put_object(Bucket=f"medfoyer-{stage}-forms", Key=f"{clinic_id}/{form_id}", Body=json.dumps(form).encode("UTF-8"))
@@ -96,7 +100,7 @@ def get_forms_handler(event, context):
 
 def summon_patient_handler(event, context):
     appointment_id = event['appointment_id']
-    appointment = dynamo.get_appointment(appointment_id)
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
     if not appointment:
         return ("Appointment not found.", 404)
     if "special_instructions" in event:
@@ -111,8 +115,10 @@ def summon_patient_handler(event, context):
 
 def get_waitlist_position_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
-    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
-    appointment = dynamo.get_appointment(appointment_id)
+    decoded_token = patient_auth.get_token_verify_id(jwt_token)
+    appointment_id = decoded_token["appointment_id"]
+    clinic_id = decoded_token["clinic_id"]
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
     if not appointment:
         return {"statusCode" : 404,
                 "body" : json.dumps("Appointment not found."),
@@ -182,7 +188,7 @@ def send_appointment_reminders_handler(event, context):
 def send_check_in_text_handler(event, context):
     appointment_id = event["appointment_id"]
     clinic_id = event["clinic_id"]
-    appointment = dynamo.get_appointment(appointment_id)
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
     if not appointment or appointment["clinic_id"] != clinic_id:
         raise RuntimeError("Appointment not found.")
     send_check_in_text(appointment)
@@ -191,8 +197,10 @@ def send_check_in_text_handler(event, context):
 def get_clinic_lat_long_handler(event, context):
     print(event["headers"])
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
-    appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
-    appointment = dynamo.get_appointment(appointment_id)
+    decoded_token = patient_auth.get_token_verify_id(jwt_token)
+    appointment_id = decoded_token["appointment_id"]
+    clinic_id = decoded_token["clinic_id"]
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
     if not appointment:
         return {"statusCode": 404,
                 "body": json.dumps("Appointment not found.", 404)}
