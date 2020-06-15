@@ -37,9 +37,11 @@ def put_token(token):
     tokens_table.put_item(Item=token)
 
 
-def get_patient(patient_id):
+def get_patient(clinic_id, patient_id):
     dynamo_response = patients_table.get_item(Key={"patient_id": patient_id})
     patient = dynamo_response.get("Item", None)
+    if patient["clinic_id"] != clinic_id:
+        return None
     return patient
 
 

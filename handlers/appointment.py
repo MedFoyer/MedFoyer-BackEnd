@@ -100,6 +100,7 @@ def get_forms_handler(event, context):
 
 def summon_patient_handler(event, context):
     appointment_id = event['appointment_id']
+    clinic_id = event["clinic_id"]
     appointment = dynamo.get_appointment(clinic_id, appointment_id)
     if not appointment:
         return ("Appointment not found.", 404)
@@ -107,7 +108,7 @@ def summon_patient_handler(event, context):
         appointment["special_instructions"] = event["special_instructions"]
     appointment["status"] = "SUMMONED"
     appointment.pop("waitlist_priority", None)
-    patient = dynamo.get_patient(appointment["patient_id"])
+    patient = dynamo.get_patient(clinic_id, appointment["patient_id"])
     twilio.notify_for_summon(patient)
     dynamo.put_appointment(appointment)
     return appointment
@@ -162,7 +163,7 @@ def send_check_in_text(appointment):
     print(f"Creating token for {appointment_id}")
     token_id = patient_auth.create_link_token(appointment)
     print("Fetching patient information.")
-    patient = dynamo.get_patient(appointment["patient_id"])
+    patient = dynamo.get_patient(appointment["clinic_id"], appointment["patient_id"])
     print("Sending text message.")
     twilio.notify_for_appointment(patient, token_id)
     print("Setting new appointment reminder status.")

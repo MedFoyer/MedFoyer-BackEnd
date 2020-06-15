@@ -41,7 +41,8 @@ def auth_appointment_handler(event, context):
                         "Access-Control-Allow-Origin": "*"
                     }}
         appointment_id = token["appointment_id"]
-        patient = dynamo.get_patient(token["patient_id"])
+        clinic_id = token["clinic_id"]
+        patient = dynamo.get_patient(clinic_id, token["patient_id"])
         clinic_id = patient["clinic_id"]
         birth_date = patient["birth_date"]
         if birth_date_assertion == birth_date:
