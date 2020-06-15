@@ -18,6 +18,11 @@ Globals:
                         Variables:
                                 STAGE: !Sub "${EnvType}"
 
+Mappings:
+        RequestMappings:
+                A: B
+
+
 Resources:
         PatientApi:
                 Type: AWS::Serverless::Api
@@ -183,7 +188,7 @@ Resources:
                 Type: AWS::AppSync::GraphQLApi
                 Properties:
                         AuthenticationType: AMAZON_COGNITO_USER_POOLS
-                        Name: !sub "${EnvType} GraphQL API"
+                        Name: !Sub "${EnvType} GraphQL API"
                         UserPoolConfig:
                                 AppIdClientRegex: 2ltoku7mtgrcr7av6b4f78iue3
                                 AwsRegion: us-west-2
