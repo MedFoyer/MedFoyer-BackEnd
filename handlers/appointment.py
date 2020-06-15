@@ -115,7 +115,7 @@ def get_waitlist_position_handler(event, context):
     appointment = dynamo.get_appointment(appointment_id)
     if not appointment:
         return {"statusCode" : 404,
-                "body" : json.dumps("Appointment not found.")
+                "body" : json.dumps("Appointment not found."),
                 "headers": {
                     "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
                     "Access-Control-Allow-Origin": "*",
