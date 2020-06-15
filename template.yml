@@ -283,6 +283,7 @@ Resources:
                 Properties:
                         ApiId: !Ref GraphApi
                         LambdaConfig:
+                                LambdaFunctionArn: !GetAtt SummonPatient.Arn
                         Name: summon_patient_lambda
                         ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
                         Type: AWS_LAMBDA
