@@ -154,11 +154,23 @@ def get_waitlist_position_handler(event, context):
             }}
 
 
+def send_appointment_reminder(appointment):
+    appointment_id = appointment["appointment_id"]
+    print(f"Creating token for {appointment_id}")
+    token_id = patient_auth.create_link_token(appointment)
+    print("Fetching patient information.")
+    patient = dynamo.get_patient(appointment["patient_id"])
+    print("Sending text message.")
+    twilio.notify_for_appointment(patient, token_id)
+    print("Setting new appointment reminder status.")
+    appointment["reminder_status"] = "CHECK_IN_REMINDER_SENT"
+    dynamo.put_appointment(appointment)
+
 def send_appointment_reminders_handler(event, context):
     # TODO: Cache this
     clinic_locations = dynamo.get_clinic_locations()
     now = int(time.time() * 1000)
-    end_time = now + 1000 * 60 * 60 * 3
+    end_time = now + 1000 * 60 * 60
     print("Checking appointments between {} and {}".format(now, end_time))
     for clinic_location in clinic_locations:
         # TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
@@ -168,15 +180,7 @@ def send_appointment_reminders_handler(event, context):
         for appointment in appointments:
             appointment_id = appointment["appointment_id"]
             if appointment.get("reminder_status", None) in [None, "NONE_SENT", "FIRST_REMINDER_SENT"]:
-                print(f"Found appointment {appointment_id} needs a reminder, creating token")
-                token_id = patient_auth.create_link_token(appointment)
-                print("Fetching patient information.")
-                patient = dynamo.get_patient(appointment["patient_id"])
-                print("Sending text message.")
-                twilio.notify_for_appointment(patient, token_id)
-                print("Setting new appointment reminder status.")
-                appointment["reminder_status"] = "CHECK_IN_REMINDER_SENT"
-                dynamo.put_appointment(appointment)
+                send_appointment_reminder(appointment)
 
 
 def get_clinic_lat_long_handler(event, context):

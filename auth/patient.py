@@ -43,3 +43,4 @@ def create_link_token(appointment):
              "patient_id" : appointment ["patient_id"],
              "failed_attempts" : 0}
     dynamo.put_token(token)
+    return token["token_id"]
