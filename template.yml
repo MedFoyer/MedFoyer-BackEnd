@@ -277,27 +277,24 @@ Resources:
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
-                        ApiId: !Ref GraphApi
+                        ApiId: !GetAtt GraphApi.ApiId
                         LambdaConfig:
                                 LambdaFunctionArn: !GetAtt SummonPatient.Arn
                         Name: summon_patient_lambda
                         ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
                         Type: AWS_LAMBDA
 
-#        Type: AWS::AppSync::Resolver
-#        Properties:
-#                ApiId: String
-#                CachingConfig:
-#                        CachingConfig
-#                DataSourceName: String
-#                FieldName: summonPatient
-#                PipelineConfig:
-#                        PipelineConfig
-#                RequestMappingTemplate: String
-#                ResponseMappingTemplate: String
-#                SyncConfig:
-#                        SyncConfig
-#                TypeName: Mutation
+#        SummonPatientResolver
+#                Type: AWS::AppSync::Resolver
+#                Properties:
+#                        ApiId: !GetAtt GraphApi.ApiId
+#                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+#                        FieldName: summonPatient
+#                        RequestMappingTemplate: String
+#                        ResponseMappingTemplate: String
+#                        SyncConfig:
+#                                SyncConfig
+#                        TypeName: Mutation
 
 
         GraphSchema:
