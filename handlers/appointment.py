@@ -1,6 +1,7 @@
 import json
 import time
 import boto3
+import os
 import uuid
 import handlers.integrations.twilio as twilio
 from geopy import distance
