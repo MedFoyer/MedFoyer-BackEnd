@@ -276,7 +276,6 @@ Resources:
                                                 }
                                             ]
                                         }
-                        RoleName: "lambda-data-source-role"
 
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
