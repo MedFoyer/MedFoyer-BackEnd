@@ -532,6 +532,29 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
 
+        GetClinicLocationsResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt ClinicLocationsDataSource.Name
+                        FieldName: getClinicLocations
+                        RequestMappingTemplate: |
+                                #set( $clinic_id = $ctx.identity.claims.clinic_id )
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "Query",
+                                    "query" : {
+                                        ## Provide a query expression. **
+                                        "expression": "clinic_id = :id",
+                                        "expressionValues" : {
+                                            ":id" : $util.dynamodb.toDynamoDBJson($clinic_id)
+                                        }
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
+                        TypeName: Query
+
         ClinicsDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
