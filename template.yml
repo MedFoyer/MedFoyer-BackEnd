@@ -684,7 +684,14 @@ Resources:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt GetFormsDataSource.Name
                         FieldName: forms
-                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        RequestMappingTemplate: |
+                                #set($unused = $context.source.put("clinic_id", $context.identity.claims.clinic_id))
+
+                                {
+                                  "version" : "2017-02-28",
+                                  "operation": "Invoke",
+                                  "payload": $util.toJson($context.source)
+                                }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Appointment
 
