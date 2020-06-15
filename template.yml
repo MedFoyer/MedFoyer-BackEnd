@@ -11,6 +11,15 @@ Parameters:
                         - dev
                         - sandbox
                 ConstraintDescription: must specify valid stage [prod|dev|sandbox].
+        DatabaseStage:
+                Description: Stage of database to use.
+                Default: SANDBOX
+                Type: String
+                AllowedValues:
+                        - PROD
+                        - DEV
+                        - SANDBOX
+                ConstraintDescription: must specify valid stage [PROD|DEV|SANDBOX].
 
 Globals:
         Function:
@@ -23,7 +32,6 @@ Mappings:
                 RequestMappings:
                         LambdaAddClinic: |
                                 #set($unused = $context.args.put("clinic_id", $context.identity.claims.clinic_id))
-                                ​
                                 {
                                   "version" : "2017-02-28",
                                   "operation": "Invoke",
@@ -275,28 +283,78 @@ Resources:
                                                     ]
                                             }
 
-#        AppointmentsDataSource:
-#                Type: AWS::AppSync::DataSource
-#                Properties:
-#                        ApiId: !GetAtt GraphApi.ApiId
-#                        Name: appointments_table
-#                        ServiceRoleArn: !GetAtt DynamoDataSourceRole.Arn
-#                        Type: AMAZON_DYNAMODB
-#                        DynamoDBConfig:
-#                                AwsRegion: us-west-2
-#                                TableName:
-#                                UseCallerCredentials: Boolean
-#                                Versioned: Boolean
-#
-#        SummonPatientResolver:
-#                Type: AWS::AppSync::Resolver
-#                Properties:
-#                        ApiId: !GetAtt GraphApi.ApiId
-#                        DataSourceName: !GetAtt SummonPatientDataSource.Name
-#                        FieldName: summonPatient
-#                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
-#                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
-#                        TypeName: Mutation
+        DynamoDataSourceRole:
+                Type: AWS::IAM::Role
+                Properties:
+                        AssumeRolePolicyDocument: |
+                                {
+                                  "Version": "2012-10-17",
+                                  "Statement": [
+                                    {
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "Service": "appsync.amazonaws.com"
+                                      },
+                                      "Action": "sts:AssumeRole"
+                                    }
+                                  ]
+                                }
+                        Path: !Sub "/${EnvType}/appsync/graphapi/"
+                        Policies:
+                                - PolicyName: dynamo-access
+                                  PolicyDocument: |
+                                          {
+                                              "Version": "2012-10-17",
+                                              "Statement": [
+                                                  {
+                                                      "Effect": "Allow",
+                                                      "Action": [
+                                                          "dynamodb:DeleteItem",
+                                                          "dynamodb:GetItem",
+                                                          "dynamodb:PutItem",
+                                                          "dynamodb:Query",
+                                                          "dynamodb:Scan",
+                                                          "dynamodb:UpdateItem"
+                                                      ],
+                                                      "Resource": [
+                                                          "arn:aws:dynamodb:us-west-2:054609857756:table/*",
+                                                          "arn:aws:dynamodb:us-west-2:054609857756:table/*/*"
+                                                      ]
+                                                  }
+                                              ]
+                                          }
+
+        AppointmentsDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        Name: appointments_table
+                        ServiceRoleArn: !GetAtt DynamoDataSourceRole.Arn
+                        Type: AMAZON_DYNAMODB
+                        DynamoDBConfig:
+                                AwsRegion: us-west-2
+                                TableName: !Sub "$DatabaseStage_APPOINTMENTS"
+
+        CreateAppointmentsResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+                        FieldName: createAppointment
+                        RequestMappingTemplate: |
+                                #set($unused = $ctx.args.put("clinic_id", $ctx.identity.claims.clinic_id))
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "PutItem",
+                                    "key" : {
+                                        ## If object "id" should come from GraphQL arguments, change to $util.dynamodb.toDynamoDBJson($ctx.args.id)
+                                        "appointment_id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+                                    },
+                                    "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args)
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
 
 
         SummonPatientDataSource:
