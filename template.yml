@@ -238,56 +238,54 @@ Resources:
                                                 RestApiId: !Ref PatientApi
                                                 Path: /ClinicLocation
                                                 Method: GET
-#
-#        LambdaDataSourceRole:
-#                Type: AWS::IAM::Role
-#                Properties:
-#                        AssumeRolePolicyDocument: |
-#                                {
-#                                  "Version": "2012-10-17",
-#                                  "Statement": [
-#                                    {
-#                                      "Effect": "Allow",
-#                                      "Principal": {
-#                                        "Service": "appsync.amazonaws.com"
-#                                      },
-#                                      "Action": "sts:AssumeRole"
-#                                    }
-#                                  ]
-#                                }
-#                        Description: String
-#                        MaxSessionDuration: Integer
-#                        Path: String
-#                        PermissionsBoundary: String
-#                        Policies:
-#                                - |
-#                                        {
-#                                            "Version": "2012-10-17",
-#                                            "Statement": [
-#                                                {
-#                                                    "Effect": "Allow",
-#                                                    "Action": [
-#                                                        "lambda:invokeFunction"
-#                                                    ],
-#                                                    "Resource": [
-#                                                        "arn:aws:lambda:us-west-2:054609857756:function:*",
-#                                                        "arn:aws:lambda:us-west-2:054609857756:function:*:*"
-#                                                    ]
-#                                                }
-#                                            ]
-#                                        }
-#                        RoleName: !Sub "${EnvType}-graph-api-"
-#                        Tags:
-#                                - Tag
-#
-#        SummonPatientDataSource:
-#                Type: AWS::AppSync::DataSource
-#                Properties:
-#                        ApiId: !Ref GraphApi
-#                        LambdaConfig:
-#                        Name: summon_patient_lambda
-#                        ServiceRoleArn: String
-#                        Type: String
+
+        LambdaDataSourceRole:
+                Type: AWS::IAM::Role
+                Properties:
+                        AssumeRolePolicyDocument: |
+                                {
+                                  "Version": "2012-10-17",
+                                  "Statement": [
+                                    {
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "Service": "appsync.amazonaws.com"
+                                      },
+                                      "Action": "sts:AssumeRole"
+                                    }
+                                  ]
+                                }
+                        Description: String
+                        MaxSessionDuration: Integer
+                        Path: !sub "${EnvType}/appsync/graphapi/"
+                        PermissionsBoundary: String
+                        Policies:
+                                - |
+                                        {
+                                            "Version": "2012-10-17",
+                                            "Statement": [
+                                                {
+                                                    "Effect": "Allow",
+                                                    "Action": [
+                                                        "lambda:invokeFunction"
+                                                    ],
+                                                    "Resource": [
+                                                        "arn:aws:lambda:us-west-2:054609857756:function:*",
+                                                        "arn:aws:lambda:us-west-2:054609857756:function:*:*"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                        RoleName: "lambda-data-source-role"
+
+        SummonPatientDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !Ref GraphApi
+                        LambdaConfig:
+                        Name: summon_patient_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
 
 
         GraphSchema:
