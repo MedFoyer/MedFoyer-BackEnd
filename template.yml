@@ -333,9 +333,9 @@ Resources:
                         Type: AMAZON_DYNAMODB
                         DynamoDBConfig:
                                 AwsRegion: us-west-2
-                                TableName: !Sub "$DatabaseStage_APPOINTMENTS"
+                                TableName: !Sub "${DatabaseStage}_APPOINTMENTS"
 
-        CreateAppointmentsResolver:
+        CreateAppointmentResolver:
                 Type: AWS::AppSync::Resolver
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
@@ -355,6 +355,16 @@ Resources:
                                 }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
+
+#        DeleteAppointmentResolver:
+#                Type: AWS::AppSync::Resolver
+#                Properties:
+#                        ApiId: !GetAtt GraphApi.ApiId
+#                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+#                        FieldName: createAppointment
+#                        RequestMappingTemplate:
+#                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+#                        TypeName: Mutation
 
 
         SummonPatientDataSource:
