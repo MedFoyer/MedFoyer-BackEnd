@@ -339,7 +339,7 @@ Resources:
                 Type: AWS::AppSync::Resolver
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
-                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+                        DataSourceName: !GetAtt AppointmentsDataSource.Name
                         FieldName: createAppointment
                         RequestMappingTemplate: |
                                 #set($unused = $ctx.args.put("clinic_id", $ctx.identity.claims.clinic_id))
@@ -361,7 +361,7 @@ Resources:
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt SummonPatientDataSource.Name
-                        FieldName: createAppointment
+                        FieldName: deleteAppointment
                         RequestMappingTemplate: |
                                 #set($clinic_id = $ctx.identity.claims.clinic_id)
 
@@ -377,6 +377,38 @@ Resources:
                                         "expression" : "clinic_id = :clinic_id",
                                         "expressionValues" : {":clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)}
                                     }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
+
+        PatientsDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        Name: patients_table
+                        ServiceRoleArn: !GetAtt DynamoDataSourceRole.Arn
+                        Type: AMAZON_DYNAMODB
+                        DynamoDBConfig:
+                                AwsRegion: us-west-2
+                                TableName: !Sub "${DatabaseStage}_PATIENTS"
+
+        CreatePatientResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PatientsDataSource.Name
+                        FieldName: createPatient
+                        RequestMappingTemplate: |
+                                #set($patient = $ctx.args.patient.put("clinic_id", $ctx.identity.claims.clinic_id))
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "PutItem",
+                                    "key" : {
+                                        ## If object "id" should come from GraphQL arguments, change to $util.dynamodb.toDynamoDBJson($ctx.args.id)
+                                        "patient_id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+                                    },
+                                    "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.patient)
                                 }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
