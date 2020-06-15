@@ -255,7 +255,7 @@ Resources:
                                     }
                                   ]
                                 }
-                        Path: !Sub "${EnvType}/appsync/graphapi/"
+                        Path: !Sub "/${EnvType}/appsync/graphapi/"
                         Policies:
                                 - PolicyName: lambda-invoke
                                   PolicyDocument: |
@@ -275,15 +275,18 @@ Resources:
                                                     ]
                                             }
 
-#        AppointmentDataSource:
+#        AppointmentsDataSource:
 #                Type: AWS::AppSync::DataSource
 #                Properties:
 #                        ApiId: !GetAtt GraphApi.ApiId
-#                        LambdaConfig:
-#                                LambdaFunctionArn: !GetAtt SummonPatient.Arn
-#                        Name: summon_patient_lambda
-#                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+#                        Name: appointments_table
+#                        ServiceRoleArn: !GetAtt DynamoDataSourceRole.Arn
 #                        Type: AMAZON_DYNAMODB
+#                        DynamoDBConfig:
+#                                AwsRegion: us-west-2
+#                                TableName:
+#                                UseCallerCredentials: Boolean
+#                                Versioned: Boolean
 #
 #        SummonPatientResolver:
 #                Type: AWS::AppSync::Resolver
