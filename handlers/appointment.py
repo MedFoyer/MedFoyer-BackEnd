@@ -178,6 +178,9 @@ def get_clinic_lat_long_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     appointment = dynamo.get_appointment(appointment_id)
+    if not appointment:
+        return {"statusCode": 404,
+                "body": json.dumps("Appointment not found.", 404)}
     clinic_location = dynamo.get_clinic_location(appointment["clinic_id"], appointment["clinic_location_id"])
     return_body = {"latitude": clinic_location["latitude"],
                    "longitude": clinic_location["longitude"]}

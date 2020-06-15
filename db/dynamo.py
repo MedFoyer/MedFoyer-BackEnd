@@ -10,7 +10,7 @@ s3_client = boto3.client('s3')
 
 
 def get_appointment(appointment_id):
-    dynamo_response = appointments_table.get_item(Key={"appointment_id": appointment_id})
+    dynamo_response = appointments_table.get_item(Key={"appointment_id": appointment_id}, ConsistentRead=True)
     appointment = dynamo_response.get("Item", None)
     return appointment
 
