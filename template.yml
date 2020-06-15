@@ -124,6 +124,17 @@ Resources:
                                                 Name: !Sub "${EnvType}-send-appointment-reminders-schedule"
                                                 Description: Schedule to send needed text messages
                                                 Enabled: True
+        SendCheckInText:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-send-check-in-text"
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+                        Handler: handlers/appointment.send_check_in_text_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Timeout: 10
         AuthAppointment:
                 Type: AWS::Serverless::Function
                 Properties:

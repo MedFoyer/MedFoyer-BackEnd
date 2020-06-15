@@ -154,7 +154,7 @@ def get_waitlist_position_handler(event, context):
             }}
 
 
-def send_appointment_reminder(appointment):
+def send_check_in_text(appointment):
     appointment_id = appointment["appointment_id"]
     print(f"Creating token for {appointment_id}")
     token_id = patient_auth.create_link_token(appointment)
@@ -180,8 +180,14 @@ def send_appointment_reminders_handler(event, context):
         for appointment in appointments:
             appointment_id = appointment["appointment_id"]
             if appointment.get("reminder_status", None) in [None, "NONE_SENT", "FIRST_REMINDER_SENT"]:
-                send_appointment_reminder(appointment)
+                send_check_in_text(appointment)
 
+def send_check_in_text_handler(event, context):
+    appointment_id = event["appointment_id"]
+    appointment = dynamo.get_appointment(appointment_id)
+    if not appointment:
+        raise RuntimeError("Appointment not found.")
+    send_check_in_text(appointment)
 
 def get_clinic_lat_long_handler(event, context):
     print(event["headers"])
