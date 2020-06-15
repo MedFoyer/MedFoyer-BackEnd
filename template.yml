@@ -16,6 +16,9 @@ Resources:
                 Type: AWS::Serverless::Api
                 Properties:
                         StageName: !Ref EnvType
+                        Environment:
+                                Variables:
+                                        Stage: !Sub "${EnvType}"
                         Cors:
                                 AllowMethods: "'POST, GET, OPTIONS'"
                                 AllowHeaders: "'X-Forwarded-For,X-Auth-Token,Content-Type,Accept'"

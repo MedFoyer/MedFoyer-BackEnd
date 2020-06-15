@@ -116,6 +116,9 @@ def get_waitlist_position_handler(event, context):
     if not appointment:
         return ("Appointment not found.", 404)
     status = appointment["status"]
+    if status == "SUMMONED":
+        return {"statusCode" : 200,
+                "body" : json.dumps({"summoned" : True})}
     if status != "CHECKED_IN":
         raise RuntimeError("Appointment not CHECKED_IN, can't check waitlist status.")
     location_id = appointment['clinic_location_id']
