@@ -12,9 +12,10 @@ Parameters:
                         - sandbox
                 ConstraintDescription: must specify valid stage [prod|dev|sandbox].
 Globals:
-        Environment:
-                Variables:
-                        STAGE: !Sub "${EnvType}"
+        Function:
+                Environment:
+                        Variables:
+                                STAGE: !Sub "${EnvType}"
 
 Resources:
         PatientApi:
