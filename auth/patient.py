@@ -40,6 +40,6 @@ def create_jwt_token(appointment_id, clinic_id):
 def create_link_token(appointment):
     token = {"token_id" : uuid.uuid4(),
              "appointment_id" : appointment["appointment_id"],
-             "patient_id" : patient_id["patient_id"],
+             "patient_id" : appointment["patient_id"],
              "failed_attempts" : 0}
     dynamo.put_token(token)
