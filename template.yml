@@ -643,6 +643,26 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Mutation
 
+        GetFormsDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt GetForms.Arn
+                        Name: get_forms_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        GetFormsResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt GetFormsDataSource.Name
+                        FieldName: forms
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Appointment
+
 
         GraphSchema:
                 Type: AWS::AppSync::GraphQLSchema
