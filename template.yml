@@ -69,6 +69,16 @@ Mappings:
 
 
 Resources:
+        GraphApi:
+                Type: AWS::AppSync::GraphQLApi
+                Properties:
+                        AuthenticationType: AMAZON_COGNITO_USER_POOLS
+                        Name: !Sub "${EnvType} GraphQL API"
+                        UserPoolConfig:
+                                AppIdClientRegex: 2ltoku7mtgrcr7av6b4f78iue3
+                                AwsRegion: us-west-2
+                                DefaultAction: DENY
+                                UserPoolId: us-west-2_QH96yFFpV
         PatientApi:
                 Type: AWS::Serverless::Api
                 Properties:
@@ -229,16 +239,16 @@ Resources:
                                                 Path: /ClinicLocation
                                                 Method: GET
 
-        GraphApi:
-                Type: AWS::AppSync::GraphQLApi
-                Properties:
-                        AuthenticationType: AMAZON_COGNITO_USER_POOLS
-                        Name: !Sub "${EnvType} GraphQL API"
-                        UserPoolConfig:
-                                AppIdClientRegex: 2ltoku7mtgrcr7av6b4f78iue3
-                                AwsRegion: us-west-2
-                                DefaultAction: DENY
-                                UserPoolId: us-west-2_QH96yFFpV
+#        SummonPatientDataSource:
+#                Type: AWS::AppSync::DataSource
+#                Properties:
+#                        ApiId: !Ref GraphApi
+#                        LambdaConfig:
+#                        Name: summon_patient_lambda
+#                        ServiceRoleArn: String
+#                        Type: String
+
+
         GraphSchema:
                 Type: AWS::AppSync::GraphQLSchema
                 Properties:
