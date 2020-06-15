@@ -74,6 +74,8 @@ Mappings:
                                 #if($context.result["clinic_id"] == "$clinic_id")
                                     $util.toJson($ctx.result)
                                 #end
+                        DynamoUnscopedAdminGet: |
+                                $util.toJson($ctx.result)
 
 
 Resources:
@@ -343,7 +345,6 @@ Resources:
                         FieldName: createAppointment
                         RequestMappingTemplate: |
                                 #set($unused = $ctx.args.put("clinic_id", $ctx.identity.claims.clinic_id))
-
                                 {
                                     "version" : "2017-02-28",
                                     "operation" : "PutItem",
@@ -443,6 +444,36 @@ Resources:
                                     "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.clinic_location)
                                 }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
+
+        ClinicsDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        Name: clinics_table
+                        ServiceRoleArn: !GetAtt DynamoDataSourceRole.Arn
+                        Type: AMAZON_DYNAMODB
+                        DynamoDBConfig:
+                                AwsRegion: us-west-2
+                                TableName: !Sub "${DatabaseStage}_CLINICS"
+
+        CreateClinicsResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt ClinicLocationsDataSource.Name
+                        FieldName: createClinicLocation
+                        RequestMappingTemplate: |
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "PutItem",
+                                    "key" : {
+                                        ## If object "id" should come from GraphQL arguments, change to $util.dynamodb.toDynamoDBJson($ctx.args.id)
+                                        "clinic_id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+                                    },
+                                    "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.clinic)
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoUnscopedAdminGet]
                         TypeName: Mutation
 
         SendCheckInTextDataSource:
