@@ -81,6 +81,7 @@ Resources:
                         Handler: handlers/appointment.summon_patient_handler
                         Runtime: python3.8
                         CodeUri: ./
+                        Timeout: 10
         GetWaitlistPriority:
                 Type: AWS::Serverless::Function
                 Properties:

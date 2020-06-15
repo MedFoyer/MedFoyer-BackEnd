@@ -15,21 +15,6 @@ clinic_locations_table = dynamodb.Table('SANDBOX_CLINIC_LOCATIONS')
 patients_table = dynamodb.Table('SANDBOX_PATIENTS')
 s3_client = boto3.client('s3')
 
-appointments = [{"appointment_id": "guid",
-                 "name": "Brian",
-                 "status": "SCHEDULED",
-                 "appointment_time": "1587791538037",
-                 "display_address": "",
-                 "lat": "1",
-                 "long": "1",
-                 }]
-
-
-def handler(event, context):
-    appointment_id = event['appointment_id']
-    appointment = next((ap for ap in appointments if ap["appointment_id"] == appointment_id), None);
-    return appointment
-
 
 def check_in_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
@@ -118,6 +103,8 @@ def summon_patient_handler(event, context):
         appointment["special_instructions"] = event["special_instructions"]
     appointment["status"] = "SUMMONED"
     del appointment["waitlist_priority"]
+    patient = dynamo.get_patient(appointment["patient_id"])
+    twilio.notify_for_summon(patient)
     appointments_table.put_item(Item=appointment)
     return appointment
 
