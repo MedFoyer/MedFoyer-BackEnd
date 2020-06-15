@@ -17,7 +17,7 @@ def send_message(message, destination):
     )
 
 
-def notify_for_appointment(appointment, patient):
+def notify_for_appointment(patient, token_id):
     global twilio_client
     if not twilio_client:
         ssm_response = ssm_client.get_parameters(Names=["twilio_account_sid", "twilio_auth_token"], WithDecryption=True)
@@ -25,7 +25,6 @@ def notify_for_appointment(appointment, patient):
         account = next((parameter for parameter in parameters if parameter["Name"] == "twilio_account_sid"))["Value"];
         auth_token = next((parameter for parameter in parameters if parameter["Name"] == "twilio_auth_token"))["Value"];
         twilio_client = Client(account, auth_token)
-    appointment_id = appointment["appointment_id"]
     patient_number = patient["phone_number"]
     send_message(
         """
@@ -36,6 +35,6 @@ Please open this link to check-in remotely when you arrive in the parking lot.
 If you do not have a smartphone, please reply "NO".
         
 https://medfoyer.com/patient/appt/%s
-        """ % appointment_id,
+        """ % token_id,
         patient_number
     )

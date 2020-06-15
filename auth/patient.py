@@ -2,6 +2,7 @@ import jwt
 import uuid
 import time
 import boto3
+import db.dynamo as dynamo
 
 ssm_client = boto3.client('ssm')
 hsa_key = None
@@ -35,3 +36,10 @@ def create_jwt_token(appointment_id, clinic_id):
                                "alg": "HS256"
                            })
     return jwt_token
+
+def create_link_token(appointment):
+    token = {"token_id" : uuid.uuid4(),
+             "appointment_id" : appointment["appointment_id"],
+             "patient_id" : patient_id["patient_id"],
+             "failed_attempts" : 0}
+    dynamo.put_token(token)
