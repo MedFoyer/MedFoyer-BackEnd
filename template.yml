@@ -663,6 +663,24 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Appointment
 
+        GetClinicLocationResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt ClinicsDataSource.Name
+                        FieldName: clinic_location
+                        RequestMappingTemplate: |
+                                {
+                                    "version": "2017-02-28",
+                                    "operation": "GetItem",
+                                    "key": {
+                                        "clinic_id": $util.dynamodb.toDynamoDBJson($ctx.source.clinic_id),
+                                        "clinic_location_id": $util.dynamodb.toDynamoDBJson($ctx.source.clinic_location_id)
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Appointment
+
 
         GraphSchema:
                 Type: AWS::AppSync::GraphQLSchema
