@@ -464,7 +464,8 @@ Resources:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PatientsDataSource.Name
                         FieldName: getPatient
-                        RequestMappingTemplate: !Sub
+                        RequestMappingTemplate:
+                                !Sub
                                 - !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
                                 - id: patient_id
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
