@@ -184,8 +184,9 @@ def send_appointment_reminders_handler(event, context):
 
 def send_check_in_text_handler(event, context):
     appointment_id = event["appointment_id"]
+    clinic_id = event["clinic_id"]
     appointment = dynamo.get_appointment(appointment_id)
-    if not appointment:
+    if not appointment or appointment["clinic_id"] != clinic_id:
         raise RuntimeError("Appointment not found.")
     send_check_in_text(appointment)
     return True
