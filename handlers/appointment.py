@@ -57,7 +57,7 @@ def submit_form_handler(event, context):
     appointment = dynamo.get_appointment(appointment_id)
     clinic_id = appointment["clinic_id"]
     form_id = str(uuid.uuid4())
-    s3_client.put_object(Bucket=f"{stage}-forms", Key=f"{clinic_id}/{form_id}", Body=json.dumps(form).encode("UTF-8"))
+    s3_client.put_object(Bucket=f"medfoyer-{stage}-forms", Key=f"{clinic_id}/{form_id}", Body=json.dumps(form).encode("UTF-8"))
     if not appointment:
         return {"statusCode": 404,
                 "body": json.dumps("Appointment not found.", 404)}
@@ -88,7 +88,7 @@ def get_forms_handler(event, context):
     forms = []
     for form_metadata in forms_metadata:
         form_id = form_metadata["form_id"]
-        form_s3_obj = s3_client.get_object(Bucket=f"{stage}-forms", Key=f"{clinic_id}/{form_id}")
+        form_s3_obj = s3_client.get_object(Bucket=f"medfoyer-{stage}-forms", Key=f"{clinic_id}/{form_id}")
         form = form_s3_obj["Body"].read()
         forms.append(form)
     return forms
