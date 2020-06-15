@@ -11,14 +11,16 @@ Parameters:
                         - dev
                         - sandbox
                 ConstraintDescription: must specify valid stage [prod|dev|sandbox].
+Globals:
+        Environment:
+                Variables:
+                        STAGE: !Sub "${EnvType}"
+
 Resources:
         PatientApi:
                 Type: AWS::Serverless::Api
                 Properties:
                         StageName: !Ref EnvType
-                        Environment:
-                                Variables:
-                                        Stage: !Sub "${EnvType}"
                         Cors:
                                 AllowMethods: "'POST, GET, OPTIONS'"
                                 AllowHeaders: "'X-Forwarded-For,X-Auth-Token,Content-Type,Accept'"

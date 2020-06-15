@@ -114,7 +114,8 @@ def get_waitlist_position_handler(event, context):
     appointment_id = patient_auth.get_appointment_verify_id(jwt_token)
     appointment = dynamo.get_appointment(appointment_id)
     if not appointment:
-        return ("Appointment not found.", 404)
+        return {"statusCode" : 200,
+                "body" : json.dumps("Appointment not found.")}
     status = appointment["status"]
     if status == "SUMMONED":
         return {"statusCode" : 200,
