@@ -11,6 +11,7 @@ Parameters:
                         - dev
                         - sandbox
                 ConstraintDescription: must specify valid stage [prod|dev|sandbox].
+
 Globals:
         Function:
                 Environment:
@@ -191,7 +192,7 @@ Resources:
         GraphSchema:
                 Type: AWS::AppSync::GraphQLSchema
                 Properties:
-                        ApiId: !Ref ClinicApi
+                        ApiId: !Ref GraphApi
                         Definion: |
                                 type Appointment @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
                                 	appointment_id: ID!
