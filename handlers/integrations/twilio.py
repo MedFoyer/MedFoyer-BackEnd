@@ -16,7 +16,7 @@ def send_message(message, destination):
         to=destination
     )
 
-def get_twilio_client():
+def init_client():
     global twilio_client
     if not twilio_client:
         ssm_response = ssm_client.get_parameters(Names=["twilio_account_sid", "twilio_auth_token"], WithDecryption=True)
