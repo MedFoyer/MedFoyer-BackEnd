@@ -188,6 +188,7 @@ def send_check_in_text_handler(event, context):
     if not appointment:
         raise RuntimeError("Appointment not found.")
     send_check_in_text(appointment)
+    return True
 
 def get_clinic_lat_long_handler(event, context):
     print(event["headers"])
