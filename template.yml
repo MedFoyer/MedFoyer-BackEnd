@@ -363,11 +363,30 @@ Resources:
                         DataSourceName: !GetAtt SummonPatientDataSource.Name
                         FieldName: createAppointment
                         RequestMappingTemplate: !Sub
-                                - !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicDelete]
+                                - !FindInMap [AppSync, RequestMappings, DynamoScopedClinicDelete]
                                 - {id : appointment_id}
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
 
+        SendCheckInTextDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt SendCheckInText.Arn
+                        Name: send_check_in_text_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        SendCheckInTextResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt SendCheckInTextDataSource.Name
+                        FieldName: sendCheckInText
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
 
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
