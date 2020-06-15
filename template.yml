@@ -38,16 +38,16 @@ Mappings:
                                   "payload": $util.toJson($context.args)
                                 }
                         DynamoScopedClinicPut: |
-                                #set($patient = $ctx.args.patient.put("clinic_id", $ctx.identity.claims.clinic_id))
+                                #set($${id} = $ctx.args.patient.put("clinic_id", $ctx.identity.claims.clinic_id))
 
                                 {
                                     "version" : "2017-02-28",
                                     "operation" : "PutItem",
                                     "key" : {
                                         ## If object "id" should come from GraphQL arguments, change to $util.dynamodb.toDynamoDBJson($ctx.args.id)
-                                        "patient_id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+                                        "${id}": $util.dynamodb.toDynamoDBJson($util.autoId()),
                                     },
-                                    "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.patient)
+                                    "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.${entity})
                                 }
                         DynamoScopedClinicDelete: |
                                 #set($clinic_id = $ctx.identity.claims.clinic_id)
@@ -362,9 +362,22 @@ Resources:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt SummonPatientDataSource.Name
                         FieldName: createAppointment
-                        RequestMappingTemplate: !Sub
-                                - !FindInMap [AppSync, RequestMappings, DynamoScopedClinicDelete]
-                                - {id : appointment_id}
+                        RequestMappingTemplate: |
+                                #set($clinic_id = $ctx.identity.claims.clinic_id)
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "DeleteItem",
+                                    "key" : {
+                                        ## If your table's hash key is not named 'id', update it here. **
+                                        "appointment_id" : { "S" : "${ctx.args.appointment_id}" }
+                                        ## If your table has a sort key, add it as an item here. **
+                                    },
+                                    "condition" : {
+                                        "expression" : "clinic_id = :clinic_id",
+                                        "expressionValues" : {":clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)}
+                                    }
+                                }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
 
