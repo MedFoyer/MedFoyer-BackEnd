@@ -57,7 +57,7 @@ Mappings:
                                     "operation" : "DeleteItem",
                                     "key" : {
                                         ## If your table's hash key is not named 'id', update it here. **
-                                        "appointment_id" : { "S" : "${ctx.args.appointment_id}" }
+                                        "${id}" : { "S" : "${!ctx.args.${id}}" }
                                         ## If your table has a sort key, add it as an item here. **
                                     },
                                     "condition" : {
@@ -356,15 +356,17 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Mutation
 
-#        DeleteAppointmentResolver:
-#                Type: AWS::AppSync::Resolver
-#                Properties:
-#                        ApiId: !GetAtt GraphApi.ApiId
-#                        DataSourceName: !GetAtt SummonPatientDataSource.Name
-#                        FieldName: createAppointment
-#                        RequestMappingTemplate:
-#                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
-#                        TypeName: Mutation
+        DeleteAppointmentResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+                        FieldName: createAppointment
+                        RequestMappingTemplate: !Sub
+                                - !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicDelete]
+                                - {id : appointment_id}
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
 
 
         SummonPatientDataSource:
