@@ -238,26 +238,45 @@ Resources:
                                                 RestApiId: !Ref PatientApi
                                                 Path: /ClinicLocation
                                                 Method: GET
-
+#
 #        LambdaDataSourceRole:
 #                Type: AWS::IAM::Role
 #                Properties:
-#                        AssumeRolePolicyDocument:
-#                                  Version: "2012-10-17",
-#                                  Statement:
-#                                        - Effect: "Allow"
-#                                          Principal:
-#                                                Service: "appsync.amazonaws.com"
-#                                                Action: sts:AssumeRole
+#                        AssumeRolePolicyDocument: |
+#                                {
+#                                  "Version": "2012-10-17",
+#                                  "Statement": [
+#                                    {
+#                                      "Effect": "Allow",
+#                                      "Principal": {
+#                                        "Service": "appsync.amazonaws.com"
+#                                      },
+#                                      "Action": "sts:AssumeRole"
+#                                    }
+#                                  ]
+#                                }
 #                        Description: String
-#                        ManagedPolicyArns:
-#                                - String
 #                        MaxSessionDuration: Integer
 #                        Path: String
 #                        PermissionsBoundary: String
 #                        Policies:
-#                                - Policy
-#                        RoleName: String
+#                                - |
+#                                        {
+#                                            "Version": "2012-10-17",
+#                                            "Statement": [
+#                                                {
+#                                                    "Effect": "Allow",
+#                                                    "Action": [
+#                                                        "lambda:invokeFunction"
+#                                                    ],
+#                                                    "Resource": [
+#                                                        "arn:aws:lambda:us-west-2:054609857756:function:*",
+#                                                        "arn:aws:lambda:us-west-2:054609857756:function:*:*"
+#                                                    ]
+#                                                }
+#                                            ]
+#                                        }
+#                        RoleName: !Sub "${EnvType}-graph-api-"
 #                        Tags:
 #                                - Tag
 #
@@ -274,7 +293,7 @@ Resources:
         GraphSchema:
                 Type: AWS::AppSync::GraphQLSchema
                 Properties:
-                        ApiId: !Ref GraphApi
+                        ApiId: !GetAtt GraphApi.ApiId
                         Definition: |
                                 type Appointment @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
                                 	appointment_id: ID!
