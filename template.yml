@@ -97,7 +97,7 @@ Resources:
                         UserPoolConfig:
                                 AppIdClientRegex: 2ltoku7mtgrcr7av6b4f78iue3
                                 AwsRegion: us-west-2
-                                DefaultAction: DENY
+                                DefaultAction: ALLOW
                                 UserPoolId: us-west-2_QH96yFFpV
         PatientApi:
                 Type: AWS::Serverless::Api
