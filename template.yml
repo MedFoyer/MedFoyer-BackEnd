@@ -257,7 +257,7 @@ Resources:
                                 }
                         Description: String
                         MaxSessionDuration: Integer
-                        Path: !sub "${EnvType}/appsync/graphapi/"
+                        Path: !Sub "${EnvType}/appsync/graphapi/"
                         PermissionsBoundary: String
                         Policies:
                                 - |
