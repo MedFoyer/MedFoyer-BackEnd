@@ -257,22 +257,45 @@ Resources:
                                 }
                         Path: !Sub "${EnvType}/appsync/graphapi/"
                         Policies:
-                                - |
-                                        {
-                                            "Version": "2012-10-17",
-                                            "Statement": [
-                                                {
-                                                    "Effect": "Allow",
-                                                    "Action": [
-                                                        "lambda:invokeFunction"
-                                                    ],
-                                                    "Resource": [
-                                                        "arn:aws:lambda:us-west-2:054609857756:function:*",
-                                                        "arn:aws:lambda:us-west-2:054609857756:function:*:*"
+                                - LambdaInvokePolicy:
+                                          PolicyName: lambda-invoke
+                                          PolicyDocument: |
+                                            {
+                                                    "Version": "2012-10-17",
+                                                    "Statement": [
+                                                    {
+                                                            "Effect": "Allow",
+                                                            "Action": [
+                                                                    "lambda:invokeFunction"
+                                                            ],
+                                                            "Resource": [
+                                                                    "arn:aws:lambda:us-west-2:054609857756:function:*",
+                                                                    "arn:aws:lambda:us-west-2:054609857756:function:*:*"
+                                                            ]
+                                                    }
                                                     ]
-                                                }
-                                            ]
-                                        }
+                                            }
+
+
+#        CheckInAppointmentDataSource:
+#                Type: AWS::AppSync::DataSource
+#                Properties:
+#                        ApiId: !GetAtt GraphApi.ApiId
+#                        LambdaConfig:
+#                                LambdaFunctionArn: !GetAtt CheckInAppointment.Arn
+#                        Name: summon_patient_lambda
+#                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+#                        Type: AWS_LAMBDA
+#
+#        CheckInAppointmentResolver:
+#                Type: AWS::AppSync::Resolver
+#                Properties:
+#                        ApiId: !GetAtt GraphApi.ApiId
+#                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+#                        FieldName: summonPatient
+#                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+#                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+#                        TypeName: Mutation
 
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
@@ -284,17 +307,15 @@ Resources:
                         ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
                         Type: AWS_LAMBDA
 
-#        SummonPatientResolver
-#                Type: AWS::AppSync::Resolver
-#                Properties:
-#                        ApiId: !GetAtt GraphApi.ApiId
-#                        DataSourceName: !GetAtt SummonPatientDataSource.Name
-#                        FieldName: summonPatient
-#                        RequestMappingTemplate: String
-#                        ResponseMappingTemplate: String
-#                        SyncConfig:
-#                                SyncConfig
-#                        TypeName: Mutation
+        SummonPatientResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt SummonPatientDataSource.Name
+                        FieldName: summonPatient
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
 
 
         GraphSchema:
