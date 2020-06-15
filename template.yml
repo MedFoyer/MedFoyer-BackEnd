@@ -20,7 +20,17 @@ Globals:
 
 Mappings:
         RequestMappings:
-                A: B
+                LambdaAddClinic: |
+                        #set($unused = $context.args.put("clinic_id", $context.identity.claims.clinic_id))
+                        ​
+                        {
+                          "version" : "2017-02-28",
+                          "operation": "Invoke",
+                          "payload": $util.toJson($context.args)
+                        }
+        ResponseMappings:
+                LambdaGeneric: |
+                        $util.toJson($context.result)
 
 
 Resources:
