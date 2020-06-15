@@ -13,3 +13,4 @@ artifacts:
   files:
     - template.yml
     - outputtemplate.yml
+    - prod_config.json
