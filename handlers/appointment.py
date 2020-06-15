@@ -166,10 +166,15 @@ def send_appointment_reminders_handler(event, context):
         appointments = dynamo.get_appointments(clinic_location["clinic_location_id"], now, end_time)
         print("Checking %d appointments" % len(appointments))
         for appointment in appointments:
+            appointment_id = appointment["appointment_id"]
             if appointment.get("reminder_status", None) in [None, "NONE_SENT", "FIRST_REMINDER_SENT"]:
+                print(f"Found appointment {appointment_id} needs a reminder, creating token")
                 token_id = patient_auth.create_link_token(appointment)
+                print("Fetching patient information.")
                 patient = dynamo.get_patient(appointment["patient_id"])
+                print("Sending text message.")
                 twilio.notify_for_appointment(patient, token_id)
+                print("Setting new appointment reminder status.")
                 appointment["reminder_status"] = "CHECK_IN_REMINDER_SENT"
                 dynamo.put_appointment(appointment)
 
