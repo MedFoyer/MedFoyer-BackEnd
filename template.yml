@@ -21,9 +21,11 @@ Parameters:
                         - SANDBOX
                 ConstraintDescription: must specify valid stage [PROD|DEV|SANDBOX].
         GraphApiCognitoAppId:
+                Type: String
                 Description: Cognito Application(s) used for authenticating to GraphAPI
                 Default: 2ltoku7mtgrcr7av6b4f78iue3
         GraphApiUserPoolId:
+                Type: String
                 Description: Cognito User Pool used for authenticating to GraphAPI
                 Default: us-west-2_QH96yFFpV
 
