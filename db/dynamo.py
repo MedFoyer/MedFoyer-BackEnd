@@ -1,11 +1,14 @@
 import boto3
+import os
+
+stage = os.environ.get("STAGE", "SANDBOX").upper()
 
 dynamodb = boto3.resource('dynamodb')
-appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
-tokens_table = dynamodb.Table('SANDBOX_TOKENS')
-clinics_table = dynamodb.Table('SANDBOX_CLINICS')
-clinic_locations_table = dynamodb.Table('SANDBOX_CLINIC_LOCATIONS')
-patients_table = dynamodb.Table('SANDBOX_PATIENTS')
+appointments_table = dynamodb.Table(f'{stage}_APPOINTMENTS')
+tokens_table = dynamodb.Table(f'{stage}_TOKENS')
+clinics_table = dynamodb.Table(f'{stage}_CLINICS')
+clinic_locations_table = dynamodb.Table(f'{stage}_CLINIC_LOCATIONS')
+patients_table = dynamodb.Table(f'{stage}_PATIENTS')
 s3_client = boto3.client('s3')
 
 
