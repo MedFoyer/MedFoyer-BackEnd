@@ -8,11 +8,6 @@ import db.dynamo as dynamo
 import auth.patient as patient_auth
 from decimal import Decimal
 
-dynamodb = boto3.resource('dynamodb')
-appointments_table = dynamodb.Table('SANDBOX_APPOINTMENTS')
-clinics_table = dynamodb.Table('SANDBOX_CLINICS')
-clinic_locations_table = dynamodb.Table('SANDBOX_CLINIC_LOCATIONS')
-patients_table = dynamodb.Table('SANDBOX_PATIENTS')
 s3_client = boto3.client('s3')
 
 
@@ -39,7 +34,7 @@ def check_in_handler(event, context):
     appointment["waitlist_priority"] = appointment["check_in_time"]
     # TODO String sanitzation
     # TODO Synchronization for multiple writes
-    appointments_table.put_item(Item=appointment)
+    dynamo.put_appointment(appointment)
     return {"statusCode": 200,
             "body": json.dumps({"status": "FILLING_FORMS"}),
             "headers": {
@@ -74,7 +69,7 @@ def submit_form_handler(event, context):
     appointment["submitted_form_metadata"].append(
         {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "0"})
     appointment["status"] = "CHECKED_IN"
-    appointments_table.put_item(Item=appointment)
+    dynamo.put_appointment(appointment)
     return {"statusCode": 200,
             "body": json.dumps({"status": "CHECKED_IN", "covid_flag": covid_flag}),
             "headers": {
@@ -105,7 +100,7 @@ def summon_patient_handler(event, context):
     appointment.pop("waitlist_priority", None)
     patient = dynamo.get_patient(appointment["patient_id"])
     twilio.notify_for_summon(patient)
-    appointments_table.put_item(Item=appointment)
+    dynamo.put_appointment(appointment)
     return appointment
 
 
@@ -139,13 +134,7 @@ def get_waitlist_position_handler(event, context):
 
     # TODO: Implement pagination, although if it's needed the waitlist is really really really long
     # TODO: Cache the waitlist somehow, so we're not doing a dynamo fetch each time
-    dynamo_waitlist = appointments_table.query(IndexName='waitlist-index',
-                                               KeyConditions={
-                                                   "clinic_location_id": {"AttributeValueList": [location_id],
-                                                                          "ComparisonOperator": "EQ"},
-                                                   "waitlist_priority": {"AttributeValueList": [priority],
-                                                                         "ComparisonOperator": "LT"}})
-    waitlist_count = dynamo_waitlist["Count"] + 1
+    waitlist_count = dynamo.get_waitlist_priority(location_id, priority)
     return {"statusCode": 200,
             "body": json.dumps({"position": waitlist_count,
                                 # TODO: Make this value more useful

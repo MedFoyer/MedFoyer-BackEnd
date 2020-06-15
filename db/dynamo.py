@@ -67,3 +67,12 @@ def get_clinic_locations():
     dynamo_response = clinic_locations_table.scan()
     clinic_locations = dynamo_response["Items"]
     return clinic_locations
+
+def get_waitlist_priority(location_id, priority):
+    dynamo_response = appointments_table.query(IndexName='waitlist-index',
+                             KeyConditions={
+                                 "clinic_location_id": {"AttributeValueList": [location_id],
+                                                        "ComparisonOperator": "EQ"},
+                                 "waitlist_priority": {"AttributeValueList": [priority],
+                                                       "ComparisonOperator": "LT"}})
+    return dynamo_response["Count"] + 1

@@ -178,5 +178,178 @@ Resources:
                                                 Path: /ClinicLocation
                                                 Method: GET
 
+        GraphApi:
+                Type: AWS::AppSync::GraphQLApi
+                Properties:
+                        AuthenticationType: AMAZON_COGNITO_USER_POOLS
+                        Name: !sub "${EnvType} GraphQL API"
+                        UserPoolConfig:
+                                AppIdClientRegex: 2ltoku7mtgrcr7av6b4f78iue3
+                                AwsRegion: us-west-2
+                                DefaultAction: DENY
+                                UserPoolId: us-west-2_QH96yFFpV
+        GraphSchema:
+                Type: AWS::AppSync::GraphQLSchema
+                Properties:
+                        ApiId: !Ref ClinicApi
+                        Definion: |
+                                type Appointment @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
+                                	appointment_id: ID!
+                                	status: String!
+                                	covid_flag: String
+                                	appointment_time: AWSTimestamp!
+                                	forms: [String]
+                                	clinic_location_id: ID!
+                                	clinic_location: ClinicLocation
+                                	patient: Patient
+                                	doctor_id: ID!
+                                	reminder_status: ReminderStatus
+                                	check_in_latitude: Float
+                                	check_in_longitude: Float
+                                	check_in_time: AWSTimestamp
+                                }
 
+                                input AppointmentInput {
+                                	status: AppointmentStatus
+                                	covid_flag: String
+                                	appointment_time: AWSTimestamp!
+                                	forms: [String]
+                                	clinic_location_id: ID!
+                                	patient_id: ID!
+                                	doctor_id: ID!
+                                	reminder_status: ReminderStatus
+                                }
 
+                                enum AppointmentStatus {
+                                	SCHEDULED
+                                	FILLING_FORMS
+                                	CHECKED_IN
+                                	SUMMONED
+                                }
+
+                                type Clinic @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
+                                	clinic_id: ID!
+                                	clinic_name: String!
+                                	clinic_locations: [ClinicLocation]
+                                }
+
+                                input ClinicInput {
+                                	clinic_name: String!
+                                }
+
+                                type ClinicLocation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
+                                	clinic_location_name: String!
+                                	clinic_location_id: ID!
+                                	latitude: String!
+                                	longitude: String!
+                                	city: String!
+                                	#Potentially eventually an Enum
+                                	state: String!
+                                	zip: String!
+                                	address: String!
+                                	required_forms: [ID]
+                                }
+
+                                input ClinicLocationInput {
+                                	clinic_location_name: String!
+                                	latitude: String!
+                                	longitude: String!
+                                	city: String!
+                                	state: String!
+                                	address: String!
+                                	zip: String!
+                                	required_forms: [ID]
+                                }
+
+                                type Mutation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
+                                	#Patient
+                                	checkIn(appointment_id: ID!, latitude: String!, longitude: String!): Appointment
+                                	submitAppointmentForm(appointment_id: ID!, form: String!): Appointment
+                                	#Clinic
+                                	createAppointment(
+                                		status: String!,
+                                		appointment_time: AWSTimestamp!,
+                                		patient_id: ID!,
+                                		clinic_location_id: ID!,
+                                		doctor_id: ID!,
+                                		reminder_status: ReminderStatus
+                                	): Appointment
+                                	deleteAppointment(appointment_id: ID!): Appointment
+                                	updateAppointment(appointment_id: ID!, appointment: AppointmentInput): Appointment
+                                	sendCheckInText(appointment_id: ID!): Boolean
+                                	summonPatient(appointment_id: ID!): Appointment
+                                	createPatient(patient: PatientInput): Patient
+                                	#Admin, for future use
+                                	createUser(name: String): User
+                                	createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation
+                                		@aws_cognito_user_pools(cognito_groups: ["practitioners"])
+                                	#Assuming not a hard delete for auditing reasons
+                                	deleteUser(user_id: String!): User
+                                	grantPermission(user_id: String!, permission: PermissionInput): User
+                                	#medfoyer admins
+                                	createClinic(clinic: ClinicInput): Clinic
+                                		@aws_cognito_user_pools(cognito_groups: ["medfoyer-admins"])
+                                }
+
+                                type Patient @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
+                                	patient_id: ID!
+                                	birth_date: AWSDate
+                                	given_name: String
+                                	last_name: String
+                                	appointment_ids: String
+                                	appointments: [Appointment]
+                                	phone_number: AWSPhone
+                                	phone_number_country_code: Int
+                                }
+
+                                type PatientAppointment {
+                                	appointment_time: Int
+                                }
+
+                                input PatientInput {
+                                	birth_date: AWSDate!
+                                	given_name: String!
+                                	last_name: String!
+                                	phone_number: AWSPhone
+                                	phone_number_country_code: Int!
+                                }
+
+                                input PermissionInput {
+                                	role: String!
+                                	scope: String!
+                                }
+
+                                type Query @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
+                                	#patient
+                                	getWaitlistPosition(appointment_id: ID!): WaitlistPosition
+                                	##Clinic, scoped to a clinic unless otherwise noted
+                                	getAppointment(appointment_id: ID!): Appointment
+                                	listAppointments: [Appointment]
+                                	getPatient(patient_id: ID!): Patient
+                                	listPatients: [Patient]
+                                	getClinic: Clinic
+                                	#internal
+                                	getContext: String
+                                	getClinicLocations: [ClinicLocation]
+                                }
+
+                                enum ReminderStatus {
+                                	NONE_SENT
+                                	FIRST_REMINDER_SENT
+                                	CHECK_IN_REMINDER_SENT
+                                	OPT_OUT
+                                }
+
+                                type User {
+                                	user_id: ID!
+                                }
+
+                                type WaitlistPosition {
+                                	position: Int
+                                	expected_wait_time: Int
+                                }
+
+                                schema {
+                                	query: Query
+                                	mutation: Mutation
+                                }
