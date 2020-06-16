@@ -44,7 +44,7 @@ You have an upcoming appointment, and your clinic uses MedFoyer to ensure a safe
 
 Please open this link to check-in remotely when you arrive in the parking lot.
 
-If you do not have a smartphone, please reply "NO".
+If you do not have a smartphone or would like to opt-out, please reply "STOP".
         
 https://medfoyer.com/patient/appt/%s
         """ % token_id,
