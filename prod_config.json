@@ -4,6 +4,6 @@
     "DatabaseStage" : "PROD",
     "GraphApiCognitoAppId" : "(?:4klcs9uc20l6rra35qrnqpm5q2)|(?:5uidlbvmbhlmoctp3gm6f13qrt)",
     "GraphApiUserPoolId" : "us-west-2_gQY6DjWWp",
-    "DefaultLambdaTimeout" : 3
+    "DefaultLambdaTimeout" : "3"
   }
 }

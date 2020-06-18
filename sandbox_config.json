@@ -1,5 +1,5 @@
 {
   "Parameters" : {
-    "DefaultLambdaTimeout" : 3
+    "DefaultLambdaTimeout" : "3"
   }
 }
