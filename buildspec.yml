@@ -14,3 +14,4 @@ artifacts:
     - template.yml
     - outputtemplate.yml
     - prod_config.json
+    - sandbox_config.json

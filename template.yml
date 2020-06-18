@@ -28,12 +28,17 @@ Parameters:
                 Type: String
                 Description: Cognito User Pool used for authenticating to GraphAPI
                 Default: us-west-2_QH96yFFpV
+        DefaultLambdaTimeout:
+                Type: Number
+                Description: Timeout on Lambda functions when not directly defined on function
+                Default: 60
 
 Globals:
         Function:
                 Environment:
                         Variables:
                                 STAGE: !Sub "${EnvType}"
+                Timeout: !Ref DefaultLambdaTimeout
 
 Mappings:
         AppSync:
