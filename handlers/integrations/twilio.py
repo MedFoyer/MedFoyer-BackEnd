@@ -5,7 +5,7 @@ import boto3
 ssm_client = boto3.client('ssm')
 
 stage = os.environ.get("STAGE", "SANDBOX").upper()
-url = "https://medfoyer.com/patient/appt/"
+url = "https://app.medfoyer.com/patient/appt/"
 
 
 account = None
@@ -46,7 +46,7 @@ Please open this link to check-in remotely when you arrive in the parking lot.
 
 If you do not have a smartphone or would like to opt-out, please reply "STOP".
         
-https://medfoyer.com/patient/appt/%s
+https://app.medfoyer.com/patient/appt/%s
         """ % token_id,
         patient_number
     )
