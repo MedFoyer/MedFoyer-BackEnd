@@ -585,6 +585,101 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
                         TypeName: Query
 
+        PractitionersDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        Name: practitioners_table
+                        ServiceRoleArn: !GetAtt DynamoDataSourceRole.Arn
+                        Type: AMAZON_DYNAMODB
+                        DynamoDBConfig:
+                                AwsRegion: us-west-2
+                                TableName: !Sub "${DatabaseStage}_PRACTITIONERS"
+
+        CreatePractitionerResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PractitionersDataSource.Name
+                        FieldName: createPractitioner
+                        RequestMappingTemplate: |
+                                #set( $clinic_id = $context.identity.claims.clinic_id )
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "PutItem",
+                                    "key" : {
+                                        ## If object "id" should come from GraphQL arguments, change to $util.dynamodb.toDynamoDBJson($ctx.args.id)
+                                        "clinic_id": $util.dynamodb.toDynamoDBJson($clinic_id),
+                                        "practitioner_id": $util.dynamodb.toDynamoDBJson($util.autoId())
+                                    },
+                                    "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.practitioner)
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
+
+        DeletePractitionerResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PractitionersDataSource.Name
+                        FieldName: deletePractitioner
+                        RequestMappingTemplate: |
+                                #set($clinic_id = $ctx.identity.claims.clinic_id)
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "DeleteItem",
+                                    "key" : {
+                                        "practitioner_id" : $util.dynamodb.toDynamoDBJson($practitioner_id),
+                                        "clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
+
+        ListPractitionersResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PractitionersDataSource.Name
+                        FieldName: listPractitioners
+                        RequestMappingTemplate: |
+                                #set( $clinic_id = $ctx.identity.claims.clinic_id )
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "Query",
+                                    "query" : {
+                                        ## Provide a query expression. **
+                                        "expression": "clinic_id = :id",
+                                        "expressionValues" : {
+                                            ":id" : $util.dynamodb.toDynamoDBJson($clinic_id)
+                                        }
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
+                        TypeName: Query
+
+        GetPractitionerResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PractitionersDataSource.Name
+                        FieldName: getPractitioner
+                        RequestMappingTemplate: |
+                                #set( $clinic_id = $ctx.identity.claims.clinic_id )
+                                {
+                                    "version": "2017-02-28",
+                                    "operation": "GetItem",
+                                    "key": {
+                                        "clinic_id": $util.dynamodb.toDynamoDBJson($clinic_id),
+                                        "practitioner_id": $util.dynamodb.toDynamoDBJson($ctx.args.practitioner_id),
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Query
+
+
         ClinicsDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
@@ -791,6 +886,18 @@ Resources:
                                 	required_forms: [ID]
                                 }
 
+                                type Practitioner {
+                                	practitioner_id: String!
+                                	given_name: String!
+                                    last_name: String!
+                                }
+
+
+                                input PractitionerInput {
+                                	given_name: String!
+                                    last_name: String!
+                                }
+
                                 type Mutation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
                                 	#Patient
                                 	checkIn(appointment_id: ID!, latitude: String!, longitude: String!): Appointment
@@ -809,6 +916,8 @@ Resources:
                                 	sendCheckInText(appointment_id: ID!): Boolean
                                 	summonPatient(appointment_id: ID!): Appointment
                                 	createPatient(patient: PatientInput): Patient
+                                    createPractitioner(practitioner: PractitionerInput): Practitioner
+                                    deletePractitioner(practitioner_id: ID!): Practitioner
                                 	#Admin, for future use
                                 	createUser(name: String): User
                                 	createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation
@@ -857,6 +966,8 @@ Resources:
                                 	listAppointments: [Appointment]
                                 	getPatient(patient_id: ID!): Patient
                                 	listPatients: [Patient]
+                                	getPractitioner(practitioner_id: ID!): Practitioner
+                                	listPractitioners: [Practitioner]
                                 	getClinic: Clinic
                                 	#internal
                                 	getContext: String
