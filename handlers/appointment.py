@@ -49,11 +49,9 @@ def check_in_handler(event, context):
             }}
 
 
-true_values = frozenset(["yes", "1", "2", "3", "4", "true", True])
-
-
 def submit_form_handler(event, context):
-    jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
+    headers = {k.lower(): v for k, v in event["headers"].items()}
+    jwt_token = headers["x-auth-token"].split(" ")[-1]
     decoded_token = patient_auth.get_token_verify_id(jwt_token)
     appointment_id = decoded_token["appointment_id"]
     clinic_id = decoded_token["clinic_id"]
@@ -67,15 +65,19 @@ def submit_form_handler(event, context):
         return {"statusCode": 404,
                 "body": json.dumps("Appointment not found.", 404)}
     covid_flag = "NORMAL"
+    priority = 0
     for question in form:
-        if question.get("value", None) in true_values:
-            covid_flag = "AT_RISK"
+        flags = question.get("flags", [])
+        for flag in flags:
+            if question.get("value", None) in flag["flaggable_answers"] and priority < flag["priority"]:
+                priority = flag["priority"]
+                covid_flag = flag["state"]
 
     appointment["covid_flag"] = covid_flag
     if "submitted_form_metadata" not in appointment:
         appointment["submitted_form_metadata"] = []
     appointment["submitted_form_metadata"].append(
-        {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "0"})
+        {"form_id": form_id, "form_type_id": "COVID", "form_type_version": "1"})
     appointment["status"] = "CHECKED_IN"
     dynamo.put_appointment(appointment)
     return {"statusCode": 200,
