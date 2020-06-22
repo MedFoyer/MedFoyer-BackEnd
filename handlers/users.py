@@ -9,7 +9,7 @@ def create_user_handler(event, context):
     email = event["email"]
     clinic_id = event["clinic_id"]
     #TODO: Determine if we need to do an existence check first
-    response = cognito_client.admin_create_user(UserPoolId="user_pool_id",
+    response = cognito_client.admin_create_user(UserPoolId=user_pool_id,
                                      Username=username,
                                      UserAttributes=[
                                          {
