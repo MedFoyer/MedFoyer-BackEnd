@@ -1012,7 +1012,7 @@ Resources:
                                 }
 
                                 type User {
-                                	user_id: ID!
+                                	username: ID!
                                 }
 
                                 type WaitlistPosition {
