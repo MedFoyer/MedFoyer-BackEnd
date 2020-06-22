@@ -986,14 +986,11 @@ Resources:
 
                                 type Practitioner {
                                 	practitioner_id: String!
-                                	given_name: String!
-                                    last_name: String!
+                                	name: String!
                                 }
 
-
                                 input PractitionerInput {
-                                	given_name: String!
-                                    last_name: String!
+                                	name: String!
                                 }
 
                                 type Mutation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
