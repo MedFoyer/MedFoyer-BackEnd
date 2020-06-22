@@ -216,6 +216,7 @@ Resources:
                         Handler: handlers/users.create_user_handler
                         Runtime: python3.8
                         CodeUri: ./
+                        Role: !GetAtt CognitoAdminRole.Arn
 
         SendAppointmentReminders:
                 Type: AWS::Serverless::Function
@@ -354,6 +355,41 @@ Resources:
                                                       "Resource": [
                                                           "arn:aws:dynamodb:us-west-2:054609857756:table/*",
                                                           "arn:aws:dynamodb:us-west-2:054609857756:table/*/*"
+                                                      ]
+                                                  }
+                                              ]
+                                          }
+
+        CognitoAdminRole:
+                Type: AWS::IAM::Role
+                Properties:
+                        AssumeRolePolicyDocument: |
+                                {
+                                  "Version": "2012-10-17",
+                                  "Statement": [
+                                    {
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "Service": "lambda.amazonaws.com"
+                                      },
+                                      "Action": "sts:AssumeRole"
+                                    }
+                                  ]
+                                }
+                        Path: !Sub "/${EnvType}/lambda/admin/"
+                        Policies:
+                                - PolicyName: !Sub "${EnvType}-cognito-admin-access"
+                                  PolicyDocument: !Sub |
+                                          {
+                                              "Version": "2012-10-17",
+                                              "Statement": [
+                                                  {
+                                                      "Effect": "Allow",
+                                                      "Action": [
+                                                          "cognito-idp:AdminCreateUser"
+                                                      ],
+                                                      "Resource": [
+                                                          "arn:aws:cognito-idp:us-west-2:054609857756:userpool/${GraphApiUserPoolId}"
                                                       ]
                                                   }
                                               ]
