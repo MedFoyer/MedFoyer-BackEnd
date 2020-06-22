@@ -21,7 +21,7 @@ def create_user_handler(event, context):
                                                  'Value': clinic_id
                                              }
                                          ])
-    except UsernameExistsException:
+    except CognitoIdentityProvider.Client.exceptions.UsernameExistsException:
         raise RuntimeError(f"Username {username} already exists!")
 
     return {"username" : response["User"]["Username"]}
@@ -37,5 +37,5 @@ def delete_user_handler(event, context):
         response = cognito_client.admin_delete_user(UserPoolId=user_pool_id,
                                          Username=username)
         return {"username" : response["User"]["Username"]}
-    except UserNotFoundException:
+    except CognitoIdentityProvider.Client.exceptions.UserNotFoundException:
         raise RuntimeError(f"Username {username} doesn't exists!")
