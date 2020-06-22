@@ -227,6 +227,24 @@ Resources:
                         CodeUri: ./
                         Role: !GetAtt CognitoAdminRole.Arn
 
+        MakeUserSysAdmin:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-make-user-sys-admin"
+                        Handler: handlers/users.make_user_sys_admin_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Role: !GetAtt CognitoAdminRole.Arn
+
+        RemoveUserFromSysAdmins:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-remove-user-from-sys-admins"
+                        Handler: handlers/users.remove_user_from_sys_admins_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Role: !GetAtt CognitoAdminRole.Arn
+
         SendAppointmentReminders:
                 Type: AWS::Serverless::Function
                 Properties:
