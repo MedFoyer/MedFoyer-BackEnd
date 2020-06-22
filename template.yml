@@ -754,23 +754,23 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
-#        GetPractitionerOnAppointmentResolver:
-#                Type: AWS::AppSync::Resolver
-#                Properties:
-#                        ApiId: !GetAtt GraphApi.ApiId
-#                        DataSourceName: !GetAtt PractitionersDataSource.Name
-#                        FieldName: practitioner
-#                        RequestMappingTemplate: |
-#                                {
-#                                    "version": "2017-02-28",
-#                                    "operation": "GetItem",
-#                                    "key": {
-#                                        "practitioner_id": $util.dynamodb.toDynamoDBJson($ctx.source.practitioner_id),
-#                                        "clinic_id": $util.dynamodb.toDynamoDBJson($context.identity.claims.clinic_id)
-#                                    }
-#                                }
-#                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
-#                        TypeName: Appointment
+        GetPractitionerOnAppointmentResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PractitionersDataSource.Name
+                        FieldName: practitioner
+                        RequestMappingTemplate: |
+                                {
+                                    "version": "2017-02-28",
+                                    "operation": "GetItem",
+                                    "key": {
+                                        "practitioner_id": $util.dynamodb.toDynamoDBJson($ctx.source.practitioner_id),
+                                        "clinic_id": $util.dynamodb.toDynamoDBJson($context.identity.claims.clinic_id)
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Appointment
 
 
         ClinicsDataSource:
