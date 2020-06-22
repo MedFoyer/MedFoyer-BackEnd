@@ -1023,17 +1023,20 @@ Resources:
                                 ##  Patient CUD
                                 ##
                                         createPatient(patient: PatientInput): Patient
+                                        updatePatient(patient_id: ID!, patient: PatientInput!): Patient
 
                                 ##
                                 ##  Practitioner CUD
                                 ##
                                         createPractitioner(practitioner: PractitionerInput): Practitioner
+                                        updatePractitioner(practitioner_id: ID!, practitioner: PractitionerInput): Practitioner
                                         deletePractitioner(practitioner_id: ID!): Practitioner
 
                                 ##
                                 ##  Clinic Location CUD
                                 ##
                                         createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation @aws_cognito_user_pools(cognito_groups: ["practitioners"])
+                                        updateClinicLocation(clinic_location_id: ID!, clinic_location: ClinicLocationInput!): ClinicLocation @aws_cognito_user_pools(cognito_groups: ["practitioners"])
 
                                 ##
                                 ##  User CUD
