@@ -32,9 +32,11 @@ def delete_user_handler(event, context):
     try:
         response = cognito_client.admin_get_user(UserPoolId=user_pool_id,
                                                  Username=username)
-        if (response["UserAttributes"]["custom:clinic_id"] != clinic_id):
+        attributes = response["User"]["Attributes"]
+        clinic_id_attribute = next((attr for attr in attributes if attr["Name"] == "custom:clinic_id"), None)
+        if clinic_id_attribute["Value"] != clinic_id:
             raise RuntimeError(f"Username {username} doesn't exists!")
-        response = cognito_client.admin_delete_user(UserPoolId=user_pool_id,
+        cognito_client.admin_delete_user(UserPoolId=user_pool_id,
                                          Username=username)
         return {"username" : response["User"]["Username"]}
     except cognito_client.exceptions.UserNotFoundException:
