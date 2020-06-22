@@ -994,34 +994,65 @@ Resources:
                                 }
 
                                 type Mutation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
-                                	#Patient
-                                	checkIn(appointment_id: ID!, latitude: String!, longitude: String!): Appointment
-                                	submitAppointmentForm(appointment_id: ID!, form: String!): Appointment
-                                	#Clinic
-                                	createAppointment(
-                                		status: String!,
-                                		appointment_time: AWSTimestamp!,
-                                		patient_id: ID!,
-                                		clinic_location_id: ID!,
-                                		doctor_id: ID!,
-                                		reminder_status: ReminderStatus
-                                	): Appointment
-                                	deleteAppointment(appointment_id: ID!): Appointment
-                                	updateAppointment(appointment_id: ID!, appointment: AppointmentInput): Appointment
-                                	sendCheckInText(appointment_id: ID!): Boolean
-                                	summonPatient(appointment_id: ID!): Appointment
-                                	createPatient(patient: PatientInput): Patient
-                                    createPractitioner(practitioner: PractitionerInput): Practitioner
-                                    deletePractitioner(practitioner_id: ID!): Practitioner
-                                	#Admin, for future use
-                                	createUser(username: String, email: AWSEmail): User
-                                	createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation
-                                		@aws_cognito_user_pools(cognito_groups: ["practitioners"])
-                                	deleteUser(username: String!): User
-                                	grantPermission(user_id: String!, permission: PermissionInput): User
-                                	#medfoyer admins
-                                	createClinic(clinic: ClinicInput): Clinic
-                                		@aws_cognito_user_pools(cognito_groups: ["medfoyer-admins"])
+                                #####
+                                ##### BEGIN MUTATIONS
+                                #####
+                                ###
+                                ### Clinic Operations
+                                ###
+                                ##
+                                ##  Appointment CUD
+                                ##
+                                        createAppointment(
+                                        	status: String!,
+                                        	appointment_time: AWSTimestamp!,
+                                        	patient_id: ID!,
+                                        	clinic_location_id: ID!,
+                                        	doctor_id: ID!,
+                                        	reminder_status: ReminderStatus
+                                        ): Appointment
+                                        deleteAppointment(appointment_id: ID!): Appointment
+                                        updateAppointment(appointment_id: ID!, appointment: AppointmentInput): Appointment
+
+                                ##
+                                ##  Appointment Operations
+                                ##
+                                        sendCheckInText(appointment_id: ID!): Boolean
+                                        summonPatient(appointment_id: ID!): Appointment
+                                ##
+                                ##  Patient CUD
+                                ##
+                                        createPatient(patient: PatientInput): Patient
+
+                                ##
+                                ##  Practitioner CUD
+                                ##
+                                        createPractitioner(practitioner: PractitionerInput): Practitioner
+                                        deletePractitioner(practitioner_id: ID!): Practitioner
+
+                                ##
+                                ##  Clinic Location CUD
+                                ##
+                                        createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation @aws_cognito_user_pools(cognito_groups: ["practitioners"])
+
+                                ##
+                                ##  User CUD
+                                ##
+                                        createUser(username: String, email: AWSEmail): User
+                                        deleteUser(username: String!): User
+                                ##
+                                ## Permission Operations
+                                ##
+                                        grantPermission(user_id: String!, permission: PermissionInput): User
+
+                                ###
+                                ###  Admin Only Operations
+                                ###
+                                        createClinic(clinic: ClinicInput): Clinic @aws_cognito_user_pools(cognito_groups: ["medfoyer-admins"])
+
+                                #####
+                                #####  FIN
+                                #####
                                 }
 
                                 type Patient @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
@@ -1053,19 +1084,39 @@ Resources:
                                 }
 
                                 type Query @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
-                                	#patient
-                                	getWaitlistPosition(appointment_id: ID!): WaitlistPosition
-                                	##Clinic, scoped to a clinic unless otherwise noted
-                                	getAppointment(appointment_id: ID!): Appointment
-                                	listAppointments: [Appointment]
-                                	getPatient(patient_id: ID!): Patient
-                                	listPatients: [Patient]
-                                	getPractitioner(practitioner_id: ID!): Practitioner
-                                	listPractitioners: [Practitioner]
-                                	getClinic: Clinic
-                                	#internal
-                                	getContext: String
-                                	getClinicLocations: [ClinicLocation]
+                                ###
+                                ###  Clinic | Scoped to a clinic unless otherwise noted.
+                                ###
+                                ##
+                                ##  Appointment Reads
+                                ##
+                                        getAppointment(appointment_id: ID!): Appointment
+                                        listAppointments: [Appointment]
+                                ##
+                                ##   Patient Reads
+                                ##
+                                        getPatient(patient_id: ID!): Patient
+                                        listPatients: [Patient]
+
+                                ##
+                                ##  Practitioner Reads
+                                ##
+                                        getPractitioner(practitioner_id: ID!): Practitioner
+                                        listPractitioners: [Practitioner]
+                                ##
+                                ##  Clinic Reads
+                                ##
+                                        getClinic: Clinic
+
+                                ##
+                                ##  Clinic Location Reads
+                                ##
+                                        getClinicLocations: [ClinicLocation]
+                                ##
+                                ##  Internal Reads
+                                ##
+                                        getContext: String
+
                                 }
 
                                 enum ReminderStatus {
