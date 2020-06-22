@@ -736,6 +736,24 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
+        GetPractitionerOnAppointmentResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PractitionersDataSource.Name
+                        FieldName: practitioner
+                        RequestMappingTemplate: |
+                                {
+                                    "version": "2017-02-28",
+                                    "operation": "GetItem",
+                                    "key": {
+                                        "practitioner_id": $util.dynamodb.toDynamoDBJson($ctx.source.doctor_id),
+                                        "clinic_id": $util.dynamodb.toDynamoDBJson($context.identity.claims.clinic_id)
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Appointment
+
 
         ClinicsDataSource:
                 Type: AWS::AppSync::DataSource
@@ -926,7 +944,8 @@ Resources:
                                 	clinic_location_id: ID!
                                 	clinic_location: ClinicLocation
                                 	patient: Patient
-                                	doctor_id: ID!
+                                	practitioner_id: ID!
+                                    practitioner: Practitioner
                                 	reminder_status: ReminderStatus
                                 	check_in_latitude: Float
                                 	check_in_longitude: Float
@@ -939,7 +958,7 @@ Resources:
                                 	appointment_time: AWSTimestamp!
                                 	clinic_location_id: ID!
                                 	patient_id: ID!
-                                	doctor_id: ID!
+                                	practitioner_id: ID!
                                 	reminder_status: ReminderStatus
                                 }
 
@@ -1008,7 +1027,7 @@ Resources:
                                         	appointment_time: AWSTimestamp!,
                                         	patient_id: ID!,
                                         	clinic_location_id: ID!,
-                                        	doctor_id: ID!,
+                                        	practitioner_id: ID!,
                                         	reminder_status: ReminderStatus
                                         ): Appointment
                                         deleteAppointment(appointment_id: ID!): Appointment
