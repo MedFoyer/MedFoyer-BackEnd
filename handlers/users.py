@@ -38,6 +38,6 @@ def delete_user_handler(event, context):
             raise RuntimeError(f"Username {username} doesn't exists!")
         cognito_client.admin_delete_user(UserPoolId=user_pool_id,
                                          Username=username)
-        return {"username" : response["User"]["Username"]}
+        return {"username" : response["Username"]}
     except cognito_client.exceptions.UserNotFoundException:
         raise RuntimeError(f"Username {username} doesn't exists!")
