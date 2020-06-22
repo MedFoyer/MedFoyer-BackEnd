@@ -38,6 +38,7 @@ Globals:
                 Environment:
                         Variables:
                                 STAGE: !Sub "${EnvType}"
+                                USER_POOL_ID: !Sub "${GraphApiUserPoolId}"
                 Timeout: !Ref DefaultLambdaTimeout
 
 Mappings:
@@ -207,6 +208,15 @@ Resources:
                         Handler: handlers/auth.claim_add_handler
                         Runtime: python3.8
                         CodeUri: ./
+
+        CreateUser:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-create-user"
+                        Handler: handlers/users.create_user_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+
         SendAppointmentReminders:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -728,6 +738,26 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
+        CreateUserDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt CreateUser.Arn
+                        Name: create_user_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        CreateUserResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt CreateUserDataSource.Name
+                        FieldName: createUser
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
+
         SendCheckInTextDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
@@ -919,7 +949,7 @@ Resources:
                                     createPractitioner(practitioner: PractitionerInput): Practitioner
                                     deletePractitioner(practitioner_id: ID!): Practitioner
                                 	#Admin, for future use
-                                	createUser(name: String): User
+                                	createUser(username: String, email: AWSEmail): User
                                 	createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation
                                 		@aws_cognito_user_pools(cognito_groups: ["practitioners"])
                                 	#Assuming not a hard delete for auditing reasons
