@@ -32,7 +32,7 @@ def delete_user_handler(event, context):
     try:
         response = cognito_client.admin_get_user(UserPoolId=user_pool_id,
                                                  Username=username)
-        attributes = response["User"]["Attributes"]
+        attributes = response["UserAttributes"]
         clinic_id_attribute = next((attr for attr in attributes if attr["Name"] == "custom:clinic_id"), None)
         if clinic_id_attribute["Value"] != clinic_id:
             raise RuntimeError(f"Username {username} doesn't exists!")
