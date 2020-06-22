@@ -218,6 +218,15 @@ Resources:
                         CodeUri: ./
                         Role: !GetAtt CognitoAdminRole.Arn
 
+        DeleteUser:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-delete-user"
+                        Handler: handlers/users.delete_user_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Role: !GetAtt CognitoAdminRole.Arn
+
         SendAppointmentReminders:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -386,7 +395,9 @@ Resources:
                                                   {
                                                       "Effect": "Allow",
                                                       "Action": [
-                                                          "cognito-idp:AdminCreateUser"
+                                                          "cognito-idp:AdminCreateUser",
+                                                          "cognito-idp:AdminGetUser",
+                                                          "cognito-idp:AdminDeleteUser"
                                                       ],
                                                       "Resource": [
                                                           "arn:aws:cognito-idp:us-west-2:054609857756:userpool/${GraphApiUserPoolId}"
@@ -794,6 +805,27 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Mutation
 
+        DeleteUserDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt DeleteUser.Arn
+                        Name: delete_user_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        DeleteUserResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt DeleteUserDataSource.Name
+                        FieldName: deleteUser
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
+
+
         SendCheckInTextDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
@@ -988,8 +1020,7 @@ Resources:
                                 	createUser(username: String, email: AWSEmail): User
                                 	createClinicLocation(clinic_location: ClinicLocationInput): ClinicLocation
                                 		@aws_cognito_user_pools(cognito_groups: ["practitioners"])
-                                	#Assuming not a hard delete for auditing reasons
-                                	deleteUser(user_id: String!): User
+                                	deleteUser(username: String!): User
                                 	grantPermission(user_id: String!, permission: PermissionInput): User
                                 	#medfoyer admins
                                 	createClinic(clinic: ClinicInput): Clinic
