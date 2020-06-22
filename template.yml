@@ -825,6 +825,45 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Mutation
 
+        MakeUserSysAdminDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt MakeUserSysAdmin.Arn
+                        Name: make_user_sys_admin_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        MakeUserSysAdminResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt MakeUserSysAdminDataSource.Name
+                        FieldName: makeUserSysAdmin
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
+
+        RemoveUserFromSysAdminsDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt RemoveUserFromSysAdmins.Arn
+                        Name: remove_user_from_sys_admins_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        RemoveUserFromSysAdminsResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt RemoveUserFromSysAdminsDataSource.Name
+                        FieldName: removeUserFromSysAdmins
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
 
         SendCheckInTextDataSource:
                 Type: AWS::AppSync::DataSource
@@ -1040,6 +1079,8 @@ Resources:
                                 ##
                                         createUser(username: String, email: AWSEmail): User
                                         deleteUser(username: String!): User
+                                        makeUserSysAdmin(username: String!): User
+                                        removeUserFromSysAdmin(username: String!): User
                                 ##
                                 ## Permission Operations
                                 ##
@@ -1127,7 +1168,9 @@ Resources:
                                 }
 
                                 type User {
-                                	username: ID!
+                                	username: String!
+                                    email: AWSEmail!
+                                    is_admin: Boolean!
                                 }
 
                                 type WaitlistPosition {
