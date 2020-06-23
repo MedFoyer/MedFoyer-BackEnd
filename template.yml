@@ -1062,11 +1062,13 @@ Resources:
 
                                 type Practitioner {
                                 	practitioner_id: String!
+                                    title: String!
                                 	name: String!
                                 }
 
                                 input PractitionerInput {
                                 	name: String!
+                                    title: String!
                                 }
 
                                 type Mutation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
