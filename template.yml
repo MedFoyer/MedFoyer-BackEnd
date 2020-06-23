@@ -1139,6 +1139,7 @@ Resources:
                                         createPatient(patient: PatientInput): Patient
                                         updatePatient(patient_id: ID!, patient: PatientInput!): Patient
                                         deletePatient(patient_id: ID!): Patient
+                                
 
                                 ##
                                 ##  Practitioner CUD
