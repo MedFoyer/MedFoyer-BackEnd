@@ -1122,7 +1122,7 @@ Resources:
                                         createUser(username: String, email: AWSEmail): User
                                         deleteUser(username: String!): User
                                         makeUserSysAdmin(username: String!): User
-                                        removeUserFromSysAdmin(username: String!): User
+                                        removeUserFromSysAdmins(username: String!): User
                                 ##
                                 ## Permission Operations
                                 ##
