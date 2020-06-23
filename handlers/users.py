@@ -90,7 +90,7 @@ def remove_user_from_sys_admins_handler(event, context):
             raise RuntimeError(f"Username {username} doesn't exists!")
         cognito_client.admin_remove_user_from_group(UserPoolId=user_pool_id,
                                                Username=username,
-                                               GroupName='sys-admin')
+                                               GroupName='sys-admins')
         return {"username" : response["Username"],
                 "email" : email_attribute["Value"],
                 "is_admin" : False}
