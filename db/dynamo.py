@@ -61,7 +61,7 @@ def list_appointments_by_location(clinic_id, clinic_location_id, start_time, end
                                                                           "ComparisonOperator": "EQ"},
                                                    "appointment_time": {"AttributeValueList": [start_time, end_time],
                                                                         "ComparisonOperator": "BETWEEN"}},
-                                               FilterExpression=Attr("clinic_id").eq(clinic_id))
+                                               FilterExpression=boto3.dynamodb.conditions.Attr("clinic_id").eq(clinic_id))
     appointments = dynamo_response["Items"]
     return appointments
 
