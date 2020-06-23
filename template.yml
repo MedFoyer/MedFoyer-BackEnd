@@ -227,6 +227,17 @@ Resources:
                         CodeUri: ./
                         Role: !GetAtt CognitoAdminRole.Arn
 
+        ListAppointments:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-list-appointments"
+                        Handler: handlers/appointment.list_appointments_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+
         MakeUserSysAdmin:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -469,28 +480,24 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
+        ListAppointmentsDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt ListAppointments.Arn
+                        Name: list_appointments_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
         ListAppointmentsResolver:
                 Type: AWS::AppSync::Resolver
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
-                        DataSourceName: !GetAtt AppointmentsDataSource.Name
+                        DataSourceName: !GetAtt ListAppointmentsDataSource.Name
                         FieldName: listAppointments
-                        RequestMappingTemplate: |
-                                #set( $clinic_id = $ctx.identity.claims.clinic_id )
-
-                                {
-                                    "version" : "2017-02-28",
-                                    "operation" : "Query",
-                                    "index" : "clinic-index",
-                                    "query" : {
-                                        ## Provide a query expression. **
-                                        "expression": "clinic_id = :id",
-                                        "expressionValues" : {
-                                            ":id" : $util.dynamodb.toDynamoDBJson($clinic_id)
-                                        }
-                                    }
-                                }
-                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Query
 
         DeleteAppointmentResolver:
@@ -1178,7 +1185,7 @@ Resources:
                                 ##  Appointment Reads
                                 ##
                                         getAppointment(appointment_id: ID!): Appointment
-                                        listAppointments: [Appointment]
+                                        listAppointments(clinic_location_id: ID, start_time: AWSTimestamp, end_time: AWSTimestamp): [Appointment]
                                 ##
                                 ##   Patient Reads
                                 ##

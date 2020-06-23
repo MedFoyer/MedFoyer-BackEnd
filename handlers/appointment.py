@@ -116,6 +116,16 @@ def summon_patient_handler(event, context):
     dynamo.put_appointment(appointment)
     return appointment
 
+def list_appointments_handler(event, context):
+    clinic_id = event["clinic_id"]
+    clinic_location_id = event.get("clinic_location_id", None)
+    start_time = event.get("start_time", 0)
+    # Default here is 2030-01-01.  TODO: Remove once we can make this field required
+    end_time = event.get("end_time", 1893484800000)
+    if clinic_location_id:
+        return dynamo.list_appointments_by_location(clinic_id, clinic_location_id, start_time, end_time)
+    return dynamo.list_appointments(clinic_id, start_time, end_time)
+
 
 def get_waitlist_position_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]
@@ -182,7 +192,7 @@ def send_appointment_reminders_handler(event, context):
     for clinic_location in clinic_locations:
         # TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
         # Get all appointments from now until an hour from now for check in text
-        appointments = dynamo.get_appointments(clinic_location["clinic_location_id"], now, end_time)
+        appointments = dynamo.list_appointments_by_location(clinic_location["clinic_id"], clinic_location["clinic_location_id"], now, end_time)
         print("Checking %d appointments" % len(appointments))
         for appointment in appointments:
             appointment_id = appointment["appointment_id"]
