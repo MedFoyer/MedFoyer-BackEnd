@@ -615,30 +615,30 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
                         TypeName: Query
 
-#        DeletePatientResolver:
-#                Type: AWS::AppSync::Resolver
-#                Properties:
-#                        ApiId: !GetAtt GraphApi.ApiId
-#                        DataSourceName: !GetAtt PatientsDataSource.Name
-#                        FieldName: deletePatient
-#                        RequestMappingTemplate: |
-#                                #set($clinic_id = $ctx.identity.claims.clinic_id)
-#
-#                                {
-#                                    "version" : "2017-02-28",
-#                                    "operation" : "DeleteItem",
-#                                    "key" : {
-#                                        ## If your table's hash key is not named 'id', update it here. **
-#                                        "patient_id" : { "S" : "${ctx.args.patient_id}" }
-#                                        ## If your table has a sort key, add it as an item here. **
-#                                    },
-#                                    "condition" : {
-#                                        "expression" : "clinic_id = :clinic_id",
-#                                        "expressionValues" : {":clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)}
-#                                    }
-#                                }
-#                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
-#                        TypeName: Mutation
+        DeletePatientResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt PatientsDataSource.Name
+                        FieldName: deletePatient
+                        RequestMappingTemplate: |
+                                #set($clinic_id = $ctx.identity.claims.clinic_id)
+
+                                {
+                                    "version" : "2017-02-28",
+                                    "operation" : "DeleteItem",
+                                    "key" : {
+                                        ## If your table's hash key is not named 'id', update it here. **
+                                        "patient_id" : { "S" : "${ctx.args.patient_id}" }
+                                        ## If your table has a sort key, add it as an item here. **
+                                    },
+                                    "condition" : {
+                                        "expression" : "clinic_id = :clinic_id",
+                                        "expressionValues" : {":clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)}
+                                    }
+                                }
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
 
 
         ClinicLocationsDataSource:
