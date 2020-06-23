@@ -44,14 +44,24 @@ def get_patient(clinic_id, patient_id):
         return None
     return patient
 
+def list_appointments(clinic_id, start_time, end_time):
+    dynamo_response = appointments_table.query(IndexName='clinic-index',
+                                               KeyConditions={
+                                                   "clinic_id": {"AttributeValueList": [clinic_id],
+                                                                          "ComparisonOperator": "EQ"},
+                                                   "appointment_time": {"AttributeValueList": [start_time, end_time],
+                                                                        "ComparisonOperator": "BETWEEN"}})
+    appointments = dynamo_response["Items"]
+    return appointments
 
-def get_appointments(clinic_location_id, start_time, end_time):
+def list_appointments_by_location(clinic_id, clinic_location_id, start_time, end_time):
     dynamo_response = appointments_table.query(IndexName='clinic-location-index',
                                                KeyConditions={
                                                    "clinic_location_id": {"AttributeValueList": [clinic_location_id],
                                                                           "ComparisonOperator": "EQ"},
                                                    "appointment_time": {"AttributeValueList": [start_time, end_time],
-                                                                        "ComparisonOperator": "BETWEEN"}})
+                                                                        "ComparisonOperator": "BETWEEN"}},
+                                               FilterExpression=Attr("clinic_id").eq(clinic_id))
     appointments = dynamo_response["Items"]
     return appointments
 
