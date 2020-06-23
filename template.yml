@@ -415,7 +415,9 @@ Resources:
                                                       "Action": [
                                                           "cognito-idp:AdminCreateUser",
                                                           "cognito-idp:AdminGetUser",
-                                                          "cognito-idp:AdminDeleteUser"
+                                                          "cognito-idp:AdminDeleteUser",
+                                                          "cognito-idp:AdminListGroupsForUser",
+                                                          "cognito-idp:AdminListUsers"
                                                       ],
                                                       "Resource": [
                                                           "arn:aws:cognito-idp:us-west-2:054609857756:userpool/${GraphApiUserPoolId}"

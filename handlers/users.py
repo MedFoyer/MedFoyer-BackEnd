@@ -64,7 +64,7 @@ def make_user_sys_admin_handler(event, context):
         response = cognito_client.admin_get_user(UserPoolId=user_pool_id,
                                                  Username=username)
         attributes = response["UserAttributes"]
-        clinic_id_attribute = next((attr for attr in attributes if attr["Name"] == "custom:clinic_id"), None)
+        clinic_id_attribute = next((attr for attr in attributes if attr["Name"] in ["custom:clinic_id", "custom:clinic_ident"]), None)
         email_attribute = next((attr for attr in attributes if attr["Name"] == "email"), None)
         if clinic_id_attribute["Value"] != clinic_id:
             raise RuntimeError(f"Username {username} doesn't exists!")
