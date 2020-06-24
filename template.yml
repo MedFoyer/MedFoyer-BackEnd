@@ -87,9 +87,10 @@ Mappings:
                                         "${id}": $util.dynamodb.toDynamoDBJson($ctx.args.${id}),
                                     }
                                 }
+                        TestMapValue: test
 
                 ResponseMappings:
-                        LambdaGeneric: |
+                        LambdaGeneric: |       
                                 $util.toJson($context.result)
                         DynamoScopedClinicGet: |
                                 #set( $clinic_id = $context.identity.claims.clinic_id )
