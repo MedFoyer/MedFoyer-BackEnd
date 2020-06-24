@@ -492,7 +492,6 @@ Resources:
                         RequestMappingTemplate:
                                 Fn::Sub:
                                 - Fn::FindInMap: [AppSync, RequestMappings, DynamoGenericGet]
-                                - {id: appointment_id}
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
