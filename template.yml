@@ -79,15 +79,14 @@ Mappings:
                                         "expressionValues" : {":clinic_id" : $util.dynamodb.toDynamoDBJson($clinic_id)}
                                     }
                                 }
-                        DynamoGenericGet: >
+                        DynamoGenericGet: |
                                 {
                                     "version": "2017-02-28",
                                     "operation": "GetItem",
                                     "key": {
-                                        "${id}": $util.dynamodb.toDynamoDBJson($ctx.args.${id}),
+                                        $id: $util.dynamodb.toDynamoDBJson($ctx.args.get($id)),
                                     }
                                 }
-                        TestMapValue: test
 
                 ResponseMappings:
                         LambdaGeneric: |
@@ -490,9 +489,11 @@ Resources:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt AppointmentsDataSource.Name
                         FieldName: getAppointment
-                        RequestMappingTemplate:
-                                Fn::Sub:
-                                - Fn::FindInMap: [AppSync, RequestMappings, TestMapValue]
+                        RequestMappingTemplate: !Sub
+                                - |
+                                        #set(id = "appointment_id")
+                                        ${Template}
+                                - Template: !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
