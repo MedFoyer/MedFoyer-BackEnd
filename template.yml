@@ -987,8 +987,8 @@ Resources:
                         DataSourceName: !GetAtt SendTelehealthTextDataSource.Name
                         FieldName: sendTelehealthText
                         RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
-                                ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
-                                TypeName: Mutation
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
 
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
