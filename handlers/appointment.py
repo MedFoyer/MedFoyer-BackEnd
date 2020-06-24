@@ -173,7 +173,7 @@ def get_waitlist_position_handler(event, context):
             "statusCode": 200,
             "body": json.dumps({
                 "summoned": True,
-                "telehealth_link": practitioner["telehealth_link"] if "telehealth_link" in practitioner else ""
+                "telehealth_link": practitioner["telehealth_link"] if "telehealth_link" in practitioner else "no_link"
             }),
             "headers": {
                 "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
