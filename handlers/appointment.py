@@ -122,8 +122,8 @@ def dispatch_telehealth_handler(event, context):
     appointment_id = event['appointment_id']
     clinic_id = event['clinic_id']
     appointment = dynamo.get_appointment(clinic_id, appointment_id)
-    patient = dynamo.get_patient(clinic_id, appointment.patient_id)
-    practitioner = dynamo.get_Practitioner(clinic_id, appointment.practitioner_id)
+    patient = dynamo.get_patient(clinic_id, appointment["patient_id"])
+    practitioner = dynamo.get_practitioner(clinic_id, appointment["practitioner_id"])
     twilio.notify_for_telehealth(patient, practitioner)
     appointment["status"] = "TELEHEALTH"
     appointment.pop("waitlist_priority", None)
