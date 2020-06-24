@@ -7,7 +7,6 @@ ssm_client = boto3.client('ssm')
 stage = os.environ.get("STAGE", "SANDBOX").upper()
 url = "https://app.medfoyer.com/patient/appt/"
 
-
 account = None
 auth_token = None
 twilio_client = None
@@ -20,6 +19,7 @@ def send_message(message, destination):
         to=destination
     )
 
+
 def init_client():
     global twilio_client
     if not twilio_client:
@@ -29,11 +29,13 @@ def init_client():
         auth_token = next((parameter for parameter in parameters if parameter["Name"] == "twilio_auth_token"))["Value"];
         twilio_client = Client(account, auth_token)
 
+
 def notify_for_summon(patient):
     init_client()
     patient_number = patient["phone_number"]
     send_message("""Your doctor is ready to see you!  Please proceed in and check in with the front desk.""",
                  patient_number)
+
 
 def notify_for_appointment(patient, token_id):
     init_client()
@@ -50,3 +52,21 @@ https://app.medfoyer.com/patient/appt/%s
         """ % token_id,
         patient_number
     )
+
+
+def notify_for_telehealth(patient, practitioner):
+    init_client()
+    patient_number = patient["phone_number"]
+    if "telehealth_link" not in practitioner:
+        send_message(
+            f"""
+                    Your doctor is requesting a telehealth consultation. Please contact them for a link.
+                    """
+            , patient_number)
+    else:
+        send_message(
+            f"""
+            Your doctor is requesting a telehealth consultation. Please join with this link {practitioner[
+                'telehealth_link']}
+            """
+            , patient_number)

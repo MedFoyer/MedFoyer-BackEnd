@@ -60,7 +60,8 @@ def submit_form_handler(event, context):
     appointment = dynamo.get_appointment(clinic_id, appointment_id)
     clinic_id = appointment["clinic_id"]
     form_id = str(uuid.uuid4())
-    s3_client.put_object(Bucket=f"medfoyer-{stage}-forms", Key=f"{clinic_id}/{form_id}", Body=json.dumps(form).encode("UTF-8"))
+    s3_client.put_object(Bucket=f"medfoyer-{stage}-forms", Key=f"{clinic_id}/{form_id}",
+                         Body=json.dumps(form).encode("UTF-8"))
     if not appointment:
         return {"statusCode": 404,
                 "body": json.dumps("Appointment not found.", 404)}
@@ -116,6 +117,20 @@ def summon_patient_handler(event, context):
     dynamo.put_appointment(appointment)
     return appointment
 
+
+def dispatch_telehealth_handler(event, context):
+    appointment_id = event['appointment_id']
+    clinic_id = event['clinic_id']
+    appointment = dynamo.get_appointment(clinic_id, appointment_id)
+    patient = dynamo.get_patient(clinic_id, appointment.patient_id)
+    practitioner = dynamo.get_Practitioner(clinic_id, appointment.practitioner_id)
+    twilio.notify_for_telehealth(patient, practitioner)
+    appointment["status"] = "TELEHEALTH"
+    appointment.pop("waitlist_priority", None)
+    dynamo.put_appointment(appointment)
+    return True
+
+
 def list_appointments_handler(event, context):
     clinic_id = event["clinic_id"]
     clinic_location_id = event.get("clinic_location_id", None)
@@ -134,8 +149,8 @@ def get_waitlist_position_handler(event, context):
     clinic_id = decoded_token["clinic_id"]
     appointment = dynamo.get_appointment(clinic_id, appointment_id)
     if not appointment:
-        return {"statusCode" : 404,
-                "body" : json.dumps("Appointment not found."),
+        return {"statusCode": 404,
+                "body": json.dumps("Appointment not found."),
                 "headers": {
                     "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
                     "Access-Control-Allow-Origin": "*",
@@ -144,8 +159,8 @@ def get_waitlist_position_handler(event, context):
                 }
     status = appointment["status"]
     if status == "SUMMONED":
-        return {"statusCode" : 200,
-                "body" : json.dumps({"summoned" : True}),
+        return {"statusCode": 200,
+                "body": json.dumps({"summoned": True}),
                 "headers": {
                     "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
                     "Access-Control-Allow-Origin": "*",
@@ -183,6 +198,7 @@ def send_check_in_text(appointment):
     appointment["reminder_status"] = "CHECK_IN_REMINDER_SENT"
     dynamo.put_appointment(appointment)
 
+
 def send_appointment_reminders_handler(event, context):
     # TODO: Cache this
     clinic_locations = dynamo.get_clinic_locations()
@@ -192,12 +208,14 @@ def send_appointment_reminders_handler(event, context):
     for clinic_location in clinic_locations:
         # TODO: A lot of room for optimization here.  Use a sparse index instead of the base one and use a filter query
         # Get all appointments from now until an hour from now for check in text
-        appointments = dynamo.list_appointments_by_location(clinic_location["clinic_id"], clinic_location["clinic_location_id"], now, end_time)
+        appointments = dynamo.list_appointments_by_location(clinic_location["clinic_id"],
+                                                            clinic_location["clinic_location_id"], now, end_time)
         print("Checking %d appointments" % len(appointments))
         for appointment in appointments:
             appointment_id = appointment["appointment_id"]
             if appointment.get("reminder_status", None) in [None, "NONE_SENT", "FIRST_REMINDER_SENT"]:
                 send_check_in_text(appointment)
+
 
 def send_check_in_text_handler(event, context):
     appointment_id = event["appointment_id"]
@@ -207,6 +225,7 @@ def send_check_in_text_handler(event, context):
         raise RuntimeError("Appointment not found.")
     send_check_in_text(appointment)
     return True
+
 
 def get_clinic_lat_long_handler(event, context):
     print(event["headers"])

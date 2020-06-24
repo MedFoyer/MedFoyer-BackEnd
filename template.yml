@@ -286,6 +286,19 @@ Resources:
                         Runtime: python3.8
                         CodeUri: ./
                         Timeout: 10
+
+        SendTelehealthText:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-send-telehealth-text"
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+                        Handler: handlers/appointment.dispatch_telehealth_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Timeout: 10
+
         AuthAppointment:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -957,6 +970,26 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Mutation
 
+        SendTelehealthTextDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt SendTelehealthText.Arn
+                        Name: send_telehealth_text_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        SendTelehealthTextResolver:
+                Type: AWS::AppSync::Resolver
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt SendTelehealthTextDataSource.Name
+                        FieldName: sendTelehealthText
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                                ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                                TypeName: Mutation
+
         SummonPatientDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
@@ -1100,11 +1133,13 @@ Resources:
                                 	practitioner_id: String!
                                     title: String!
                                 	name: String!
+                                    telehealth_link: String
                                 }
 
                                 input PractitionerInput {
                                 	name: String!
                                     title: String!
+                                    telehealth_link: String
                                 }
 
                                 type Mutation @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
@@ -1132,6 +1167,7 @@ Resources:
                                 ##  Appointment Operations
                                 ##
                                         sendCheckInText(appointment_id: ID!): Boolean
+                                        sendTelehealthText(appointment_id: ID!): Boolean
                                         summonPatient(appointment_id: ID!): Appointment
                                 ##
                                 ##  Patient CUD

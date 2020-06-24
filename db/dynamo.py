@@ -9,7 +9,17 @@ tokens_table = dynamodb.Table(f'{stage}_TOKENS')
 clinics_table = dynamodb.Table(f'{stage}_CLINICS')
 clinic_locations_table = dynamodb.Table(f'{stage}_CLINIC_LOCATIONS')
 patients_table = dynamodb.Table(f'{stage}_PATIENTS')
+practitioners_table = dynamodb.Table(f'{stage}_PRACTITIONERS')
 s3_client = boto3.client('s3')
+
+
+def get_practitioner(clinic_id, practitioner_id):
+    dynamo_response = practitioners_table.get_item(Key={"clinic_id":clinic_id,
+                                                        "practitioner_id":practitioner_id})
+    practitioner = dynamo_response.get("Item", None)
+    if practitioner['clinic_id'] != clinic_id:
+        return None
+    return practitioner
 
 
 def get_appointment(clinic_id, appointment_id):
@@ -44,15 +54,17 @@ def get_patient(clinic_id, patient_id):
         return None
     return patient
 
+
 def list_appointments(clinic_id, start_time, end_time):
     dynamo_response = appointments_table.query(IndexName='clinic-index',
                                                KeyConditions={
                                                    "clinic_id": {"AttributeValueList": [clinic_id],
-                                                                          "ComparisonOperator": "EQ"},
+                                                                 "ComparisonOperator": "EQ"},
                                                    "appointment_time": {"AttributeValueList": [start_time, end_time],
                                                                         "ComparisonOperator": "BETWEEN"}})
     appointments = dynamo_response["Items"]
     return appointments
+
 
 def list_appointments_by_location(clinic_id, clinic_location_id, start_time, end_time):
     dynamo_response = appointments_table.query(IndexName='clinic-location-index',
@@ -61,9 +73,11 @@ def list_appointments_by_location(clinic_id, clinic_location_id, start_time, end
                                                                           "ComparisonOperator": "EQ"},
                                                    "appointment_time": {"AttributeValueList": [start_time, end_time],
                                                                         "ComparisonOperator": "BETWEEN"}},
-                                               FilterExpression=boto3.dynamodb.conditions.Attr("clinic_id").eq(clinic_id))
+                                               FilterExpression=boto3.dynamodb.conditions.Attr("clinic_id").eq(
+                                                   clinic_id))
     appointments = dynamo_response["Items"]
     return appointments
+
 
 def put_appointment(appointment):
     appointments_table.put_item(Item=appointment)
@@ -82,11 +96,12 @@ def get_clinic_locations():
     clinic_locations = dynamo_response["Items"]
     return clinic_locations
 
+
 def get_waitlist_priority(location_id, priority):
     dynamo_response = appointments_table.query(IndexName='waitlist-index',
-                             KeyConditions={
-                                 "clinic_location_id": {"AttributeValueList": [location_id],
-                                                        "ComparisonOperator": "EQ"},
-                                 "waitlist_priority": {"AttributeValueList": [priority],
-                                                       "ComparisonOperator": "LT"}})
+                                               KeyConditions={
+                                                   "clinic_location_id": {"AttributeValueList": [location_id],
+                                                                          "ComparisonOperator": "EQ"},
+                                                   "waitlist_priority": {"AttributeValueList": [priority],
+                                                                         "ComparisonOperator": "LT"}})
     return dynamo_response["Count"] + 1
