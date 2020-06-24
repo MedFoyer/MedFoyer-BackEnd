@@ -489,7 +489,10 @@ Resources:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt AppointmentsDataSource.Name
                         FieldName: getAppointment
-                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
+                        RequestMappingTemplate:
+                                Fn::Sub:
+                                - !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
+                                - {id: appointment_id}
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
