@@ -1159,8 +1159,8 @@ Resources:
                                 ##
                                         createUser(username: String, email: AWSEmail): User
                                         deleteUser(username: String!): User
-                                        makeUserSysAdmin(username: String!): User
-                                        removeUserFromSysAdmins(username: String!): User
+                                        makeUserSysAdmin(username: String!): User @aws_auth(cognito_groups: ["sys-admins"])
+                                        removeUserFromSysAdmins(username: String!): User @aws_auth(cognito_groups: ["sys-admins"])
                                 ##
                                 ## Permission Operations
                                 ##
