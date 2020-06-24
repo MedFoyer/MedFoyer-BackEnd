@@ -90,7 +90,7 @@ Mappings:
                         TestMapValue: test
 
                 ResponseMappings:
-                        LambdaGeneric: |       
+                        LambdaGeneric: |
                                 $util.toJson($context.result)
                         DynamoScopedClinicGet: |
                                 #set( $clinic_id = $context.identity.claims.clinic_id )
@@ -492,7 +492,7 @@ Resources:
                         FieldName: getAppointment
                         RequestMappingTemplate:
                                 Fn::Sub:
-                                - Fn::FindInMap: [AppSync, RequestMappings, DynamoGenericGet]
+                                - Fn::FindInMap: [AppSync, RequestMappings, TestMapValue]
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
                         TypeName: Query
 
