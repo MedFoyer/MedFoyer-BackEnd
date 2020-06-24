@@ -491,7 +491,7 @@ Resources:
                         FieldName: getAppointment
                         RequestMappingTemplate: !Sub
                                 - |
-                                        #set(id = "appointment_id")
+                                        #set($id = "appointment_id")
                                         ${Template}
                                 - Template: !FindInMap [AppSync, RequestMappings, DynamoGenericGet]
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
