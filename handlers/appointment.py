@@ -167,6 +167,20 @@ def get_waitlist_position_handler(event, context):
                     "Access-Control-Allow-Credentials": "true",
                 }
                 }
+    elif status == "TELEHEALTH":
+        practitioner = dynamo.get_practitioner(clinic_id, appointment["practitioner_id"])
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "summoned": True,
+                "telehealth_link": practitioner["telehealth_link"] if "telehealth_link" in practitioner else ""
+            }),
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type, X-Auth-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        }
     if status != "CHECKED_IN":
         raise RuntimeError("Appointment not CHECKED_IN, can't check waitlist status.")
     location_id = appointment['clinic_location_id']
