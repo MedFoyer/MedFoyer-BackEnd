@@ -43,6 +43,9 @@ def auth_appointment_handler(event, context):
         appointment_id = token["appointment_id"]
         clinic_id = token["clinic_id"]
         patient = dynamo.get_patient(clinic_id, token["patient_id"])
+        if not patient:
+            return {"statusCode": 404,
+                    "body": json.dumps("Patient not found for given token.")}
         clinic_id = patient["clinic_id"]
         birth_date = patient["birth_date"]
         if birth_date_assertion == birth_date:
