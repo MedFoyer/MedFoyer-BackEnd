@@ -986,6 +986,7 @@ Resources:
 
         SendTelehealthTextResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt SendTelehealthTextDataSource.Name
