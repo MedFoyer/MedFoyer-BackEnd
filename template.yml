@@ -465,6 +465,7 @@ Resources:
 
         CreateAppointmentResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt AppointmentsDataSource.Name
@@ -485,6 +486,7 @@ Resources:
 
         GetAppointmentResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt AppointmentsDataSource.Name
@@ -509,6 +511,7 @@ Resources:
 
         ListAppointmentsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ListAppointmentsDataSource.Name
@@ -519,6 +522,7 @@ Resources:
 
         DeleteAppointmentResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt AppointmentsDataSource.Name
@@ -555,6 +559,7 @@ Resources:
 
         CreatePatientResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PatientsDataSource.Name
@@ -576,6 +581,7 @@ Resources:
 
         GetPatientResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PatientsDataSource.Name
@@ -593,6 +599,7 @@ Resources:
 
         GetPatientOnAppointmentResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PatientsDataSource.Name
@@ -610,6 +617,7 @@ Resources:
 
         ListPatientsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PatientsDataSource.Name
@@ -672,6 +680,7 @@ Resources:
 
         CreateClinicLocationsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ClinicLocationsDataSource.Name
@@ -693,6 +702,7 @@ Resources:
 
         GetClinicLocationsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ClinicLocationsDataSource.Name
@@ -727,6 +737,7 @@ Resources:
 
         CreatePractitionerResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PractitionersDataSource.Name
@@ -748,6 +759,7 @@ Resources:
 
         DeletePractitionerResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PractitionersDataSource.Name
@@ -768,6 +780,7 @@ Resources:
 
         ListPractitionersResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PractitionersDataSource.Name
@@ -791,6 +804,7 @@ Resources:
 
         GetPractitionerResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PractitionersDataSource.Name
@@ -810,6 +824,7 @@ Resources:
 
         GetPractitionerOnAppointmentResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt PractitionersDataSource.Name
@@ -840,6 +855,7 @@ Resources:
 
         CreateClinicsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ClinicsDataSource.Name
@@ -859,6 +875,7 @@ Resources:
 
         GetClinicResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ClinicsDataSource.Name
@@ -887,6 +904,7 @@ Resources:
 
         CreateUserResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt CreateUserDataSource.Name
@@ -907,6 +925,7 @@ Resources:
 
         DeleteUserResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt DeleteUserDataSource.Name
@@ -927,6 +946,7 @@ Resources:
 
         MakeUserSysAdminResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt MakeUserSysAdminDataSource.Name
@@ -947,6 +967,7 @@ Resources:
 
         RemoveUserFromSysAdminsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt RemoveUserFromSysAdminsDataSource.Name
@@ -967,6 +988,7 @@ Resources:
 
         SendCheckInTextResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt SendCheckInTextDataSource.Name
@@ -988,6 +1010,7 @@ Resources:
         SendTelehealthTextResolver:
                 Type: AWS::AppSync::Resolver
                 DependsOn: GraphSchema
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt SendTelehealthTextDataSource.Name
@@ -1008,6 +1031,7 @@ Resources:
 
         SummonPatientResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt SummonPatientDataSource.Name
@@ -1028,6 +1052,7 @@ Resources:
 
         GetFormsResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt GetFormsDataSource.Name
@@ -1045,6 +1070,7 @@ Resources:
 
         GetClinicLocationResolver:
                 Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId
                         DataSourceName: !GetAtt ClinicLocationsDataSource.Name
