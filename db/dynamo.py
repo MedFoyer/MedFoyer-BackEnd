@@ -12,6 +12,29 @@ patients_table = dynamodb.Table(f'{stage}_PATIENTS')
 practitioners_table = dynamodb.Table(f'{stage}_PRACTITIONERS')
 s3_client = boto3.client('s3')
 
+def update_item(table, key, object):
+    clinic_id = object.get("clinic_id", None)
+    clinic_id = key.get("clinic_id", clinic_id)
+    if not clinic_id:
+        raise RuntimeError("Clinic id must be set on key or update object.")
+    update_expression = ",".join(map(lambda x: f"SET #attribute{x} = :attribute{x}", range(len(object))))
+    attribute_names = {}
+    attribute_values = {}
+    object_items = object.items()
+    for i in range(len(object)):
+        attribute_names.put(f"#attribute{x}", object_items[i][0])
+        attribute_values.put(f":attribute{x}", object_items[i][1])
+
+    dynamo_response = table.update_item(
+        Key = key,
+        UpdateExpression = update_expression,
+        ExpressionAttributeNames = attribute_names,
+        ExpressionAttributeValues = attribute_values,
+        ConditionExpression = boto3.dynamodb.conditions.Attr("clinic_id").eq(clinic_id),
+        ReturnValues = "ALL_NEW"
+    )
+
+
 
 def get_practitioner(clinic_id, practitioner_id):
     dynamo_response = practitioners_table.get_item(Key={"clinic_id":clinic_id,
@@ -89,6 +112,8 @@ def get_clinics():
     clinics = dynamo_response["Items"]
     return clinics
 
+def update_patient(patient_id, patient):
+    update_item(patients_table, {"patient_id" : patient_id}, patient)
 
 def get_clinic_locations():
     # TODO: Needs pagination (and optimization) when we start rolling in customers

@@ -238,6 +238,18 @@ Resources:
                                 - AmazonDynamoDBFullAccess
                                 - AmazonSSMReadOnlyAccess
 
+        UpdatePatient:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-update-patient"
+                        Handler: handlers/patient.update_patient_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+
+
         MakeUserSysAdmin:
                 Type: AWS::Serverless::Function
                 Properties:
@@ -639,6 +651,27 @@ Resources:
                                 }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
                         TypeName: Query
+
+        UpdatePatientDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt UpdatePatient.Arn
+                        Name: update_patient_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        UpdatePatientResolver:
+                Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt UpdatePatientDataSource.Name
+                        FieldName: updatePatient
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
 
         DeletePatientResolver:
                 Type: AWS::AppSync::Resolver
