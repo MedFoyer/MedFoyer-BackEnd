@@ -20,7 +20,7 @@ def update_item(table, key, object):
     update_expression = ",".join(map(lambda x: f"SET #attribute{x} = :attribute{x}", range(len(object))))
     attribute_names = {}
     attribute_values = {}
-    for i, attr in zip(range(len(object)), object.items()):
+    for x, attr in zip(range(len(object)), object.items()):
         attribute_names[f"#attribute{x}"] = attr[0]
         attribute_values[f":attribute{x}"] = attr[1]
 
