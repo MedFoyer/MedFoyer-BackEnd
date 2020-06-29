@@ -22,8 +22,8 @@ def update_item(table, key, object):
     attribute_values = {}
     object_items = object.items()
     for i in range(len(object)):
-        attribute_names.put(f"#attribute{x}", object_items[i][0])
-        attribute_values.put(f":attribute{x}", object_items[i][1])
+        attribute_names[f"#attribute{x}"] = object_items[i][0]
+        attribute_values[f":attribute{x}"] = object_items[i][1]
 
     dynamo_response = table.update_item(
         Key = key,
