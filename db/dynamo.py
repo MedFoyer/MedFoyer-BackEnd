@@ -20,10 +20,9 @@ def update_item(table, key, object):
     update_expression = ",".join(map(lambda x: f"SET #attribute{x} = :attribute{x}", range(len(object))))
     attribute_names = {}
     attribute_values = {}
-    object_items = object.items()
-    for i in range(len(object)):
-        attribute_names[f"#attribute{x}"] = object_items[i][0]
-        attribute_values[f":attribute{x}"] = object_items[i][1]
+    for i, attr in zip(range(len(object)), object.items()):
+        attribute_names[f"#attribute{x}"] = attr[0]
+        attribute_values[f":attribute{x}"] = attr[1]
 
     dynamo_response = table.update_item(
         Key = key,
