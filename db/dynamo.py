@@ -32,6 +32,7 @@ def update_item(table, key, object):
         ConditionExpression = boto3.dynamodb.conditions.Attr("clinic_id").eq(clinic_id),
         ReturnValues = "ALL_NEW"
     )
+    return dynamo_response["Attributes"]
 
 
 
@@ -112,7 +113,7 @@ def get_clinics():
     return clinics
 
 def update_patient(patient_id, patient):
-    update_item(patients_table, {"patient_id" : patient_id}, patient)
+    return update_item(patients_table, {"patient_id" : patient_id}, patient)
 
 def get_clinic_locations():
     # TODO: Needs pagination (and optimization) when we start rolling in customers

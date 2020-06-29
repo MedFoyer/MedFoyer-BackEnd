@@ -5,4 +5,4 @@ def update_patient_handler(event, context):
     patient = event["patient"]
     patient_id = event["patient_id"]
     patient["clinic_id"] = clinic_id
-    dynamo.update_patient(patient_id, patient)
+    return dynamo.update_patient(patient_id, patient)
