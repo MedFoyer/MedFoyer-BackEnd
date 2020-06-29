@@ -17,7 +17,7 @@ def update_item(table, key, object):
     clinic_id = key.get("clinic_id", clinic_id)
     if not clinic_id:
         raise RuntimeError("Clinic id must be set on key or update object.")
-    update_expression = ",".join(map(lambda x: f"SET #attribute{x} = :attribute{x}", range(len(object))))
+    update_expression = ", ".join(map(lambda x: f"SET #attribute{x} = :attribute{x}", range(len(object))))
     attribute_names = {}
     attribute_values = {}
     for x, attr in zip(range(len(object)), object.items()):
