@@ -13,6 +13,13 @@ s3_client = boto3.client('s3')
 
 stage = os.environ.get("STAGE", "sandbox")
 
+def update_appointment_handler(event, context):
+    clinic_id = event["clinic_id"]
+    appointment = event["appointment"]
+    appointment_id = event["appointment_id"]
+    appointment["clinic_id"] = clinic_id
+    return dynamo.update_appointment(appointment_id, appointment)
+
 
 def check_in_handler(event, context):
     jwt_token = event["headers"]["x-auth-token"].split(" ")[-1]

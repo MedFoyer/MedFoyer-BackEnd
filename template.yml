@@ -249,6 +249,39 @@ Resources:
                                 - AmazonDynamoDBFullAccess
                                 - AmazonSSMReadOnlyAccess
 
+        UpdateAppointment:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-update-appointment"
+                        Handler: handlers/appointment.update_appointment_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+
+        UpdatePractitioner:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-update-practitioner"
+                        Handler: handlers/practitioner.update_practitioner_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+
+        UpdateClinicLocation:
+                Type: AWS::Serverless::Function
+                Properties:
+                        FunctionName: !Sub "${EnvType}-update-clinic-location"
+                        Handler: handlers/clinic_location.update_clinic_location_handler
+                        Runtime: python3.8
+                        CodeUri: ./
+                        Policies:
+                                - AmazonDynamoDBFullAccess
+                                - AmazonSSMReadOnlyAccess
+
 
         MakeUserSysAdmin:
                 Type: AWS::Serverless::Function
@@ -532,6 +565,27 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Query
 
+        UpdateAppointmentDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt UpdateAppointment.Arn
+                        Name: update_appointment_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        UpdateAppointmentResolver:
+                Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt UpdateAppointmentDataSource.Name
+                        FieldName: updateAppointment
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
+
         DeleteAppointmentResolver:
                 Type: AWS::AppSync::Resolver
                 DependsOn: GraphSchema
@@ -757,6 +811,27 @@ Resources:
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoGenericList]
                         TypeName: Query
 
+        UpdateClinicLocationDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt UpdateClinicLocation.Arn
+                        Name: update_clinic_location_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        UpdateClinicLocationResolver:
+                Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt UpdateClinicLocationDataSource.Name
+                        FieldName: updateClinicLocation
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
+                        TypeName: Mutation
+
         PractitionersDataSource:
                 Type: AWS::AppSync::DataSource
                 Properties:
@@ -788,6 +863,27 @@ Resources:
                                     "attributeValues" : $util.dynamodb.toMapValuesJson($ctx.args.practitioner)
                                 }
                         ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, DynamoScopedClinicGet]
+                        TypeName: Mutation
+
+        UpdatePractitionerDataSource:
+                Type: AWS::AppSync::DataSource
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        LambdaConfig:
+                                LambdaFunctionArn: !GetAtt UpdatePractitioner.Arn
+                        Name: update_practitioner_lambda
+                        ServiceRoleArn: !GetAtt LambdaDataSourceRole.Arn
+                        Type: AWS_LAMBDA
+
+        UpdatePractitionerResolver:
+                Type: AWS::AppSync::Resolver
+                DependsOn: GraphSchema
+                Properties:
+                        ApiId: !GetAtt GraphApi.ApiId
+                        DataSourceName: !GetAtt UpdatePractitionerDataSource.Name
+                        FieldName: updatePractitioner
+                        RequestMappingTemplate: !FindInMap [AppSync, RequestMappings, LambdaAddClinic]
+                        ResponseMappingTemplate: !FindInMap [AppSync, ResponseMappings, LambdaGeneric]
                         TypeName: Mutation
 
         DeletePractitionerResolver:
@@ -1042,7 +1138,6 @@ Resources:
 
         SendTelehealthTextResolver:
                 Type: AWS::AppSync::Resolver
-                DependsOn: GraphSchema
                 DependsOn: GraphSchema
                 Properties:
                         ApiId: !GetAtt GraphApi.ApiId

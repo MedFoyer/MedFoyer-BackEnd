@@ -56,6 +56,9 @@ def get_practitioner(clinic_id, practitioner_id):
         return None
     return practitioner
 
+def update_practitioner(clinic_id, practitioner_id, practitioner):
+    return update_item(practitioners_table, {"clinic_id" : clinic_id, "practitioner_id" : practitioner_id}, practitioner)
+
 
 def get_appointment(clinic_id, appointment_id):
     dynamo_response = appointments_table.get_item(Key={"appointment_id": appointment_id}, ConsistentRead=True)
@@ -64,6 +67,8 @@ def get_appointment(clinic_id, appointment_id):
         return None
     return appointment
 
+def update_appointment(appointment_id, appointment):
+    return update_item(appointments_table, {"appointment_id" : appointment_id}, appointment)
 
 def get_clinic_location(clinic_id, clinic_location_id):
     dynamo_response = clinic_locations_table.get_item(Key={"clinic_id": clinic_id,
@@ -132,6 +137,9 @@ def get_clinic_locations():
     dynamo_response = clinic_locations_table.scan()
     clinic_locations = dynamo_response["Items"]
     return clinic_locations
+
+def update_clinic_location(clinic_id, clinic_location_id, clinic_location):
+    return update_item(clinic_locations_table, {"clinic_id" : clinic_id, "clinic_location_id" : clinic_location_id}, clinic_location)
 
 
 def get_waitlist_priority(location_id, priority):
