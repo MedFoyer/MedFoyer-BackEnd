@@ -17,12 +17,24 @@ def update_item(table, key, object):
     clinic_id = key.get("clinic_id", clinic_id)
     if not clinic_id:
         raise RuntimeError("Clinic id must be set on key or update object.")
-    update_expression = "SET " + ", ".join(map(lambda x: f"#attribute{x} = :attribute{x}", range(len(object))))
     attribute_names = {}
     attribute_values = {}
+    updates = []
+    removes = []
     for x, attr in zip(range(len(object)), object.items()):
-        attribute_names[f"#attribute{x}"] = attr[0]
-        attribute_values[f":attribute{x}"] = attr[1]
+        attribute_name = f"#attribute{x}"
+        attribute_value_name = f":attribute{x}"
+        attribute_names[attribute_name] = attr[0]
+        if attr[1] is not None:
+            updates.append(f"{attribute_name} = {attribute_value_name}")
+            attribute_values[attribute_value_name] = attr[1]
+        else:
+            removes.append(attribute_name)
+    update_expression = ""
+    if updates:
+        update_expression += "SET " + ", ".join(updates)
+    if removes:
+        update_expression += " REMOVE" + ", ".join(deletes)
 
     dynamo_response = table.update_item(
         Key = key,
