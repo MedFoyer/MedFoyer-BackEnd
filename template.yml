@@ -1375,8 +1375,7 @@ Resources:
                                 type Patient @aws_cognito_user_pools(cognito_groups: ["practitioners"]) {
                                 	patient_id: ID!
                                 	birth_date: AWSDate
-                                	given_name: String
-                                	last_name: String
+                                	name: String
                                 	appointment_ids: String
                                 	appointments: [Appointment]
                                 	phone_number: AWSPhone
@@ -1389,8 +1388,7 @@ Resources:
 
                                 input PatientInput {
                                 	birth_date: AWSDate!
-                                	given_name: String!
-                                	last_name: String!
+                                	name: String!
                                 	phone_number: AWSPhone
                                 	phone_number_country_code: Int!
                                 }
