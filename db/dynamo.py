@@ -34,7 +34,7 @@ def update_item(table, key, object):
     if updates:
         update_expression += "SET " + ", ".join(updates)
     if removes:
-        update_expression += " REMOVE" + ", ".join(deletes)
+        update_expression += " REMOVE" + ", ".join(removes)
 
     dynamo_response = table.update_item(
         Key = key,
