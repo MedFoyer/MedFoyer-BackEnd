@@ -5,8 +5,6 @@ import boto3
 ssm_client = boto3.client('ssm')
 
 stage = os.environ.get("STAGE", "SANDBOX").upper()
-subdomain = "app" if stage == "PROD" else "dev"
-url = f"https://{subdomain}.medfoyer.com/patient/appt/"
 
 account = None
 auth_token = None
@@ -41,16 +39,17 @@ def notify_for_summon(patient):
 def notify_for_appointment(patient, token_id):
     init_client()
     patient_number = patient["phone_number"]
+    subdomain = "app" if stage == "PROD" else "dev"
     send_message(
-        """
+        f"""
 You have an upcoming appointment, and your clinic uses MedFoyer to ensure a safe and smooth check-in.
 
 Please open this link to check-in remotely when you arrive in the parking lot.
 
 If you do not have a smartphone or would like to opt-out, please reply "STOP".
         
-https://app.medfoyer.com/patient/appt/%s
-        """ % token_id,
+https://{subdomain}.medfoyer.com/patient/appt/{token_id}
+        """,
         patient_number
     )
 
