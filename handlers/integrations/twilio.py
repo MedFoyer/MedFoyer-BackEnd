@@ -5,7 +5,8 @@ import boto3
 ssm_client = boto3.client('ssm')
 
 stage = os.environ.get("STAGE", "SANDBOX").upper()
-url = "https://app.medfoyer.com/patient/appt/"
+subdomain = "app" if stage == "PROD" else "dev"
+url = f"https://{subdomain}.medfoyer.com/patient/appt/"
 
 account = None
 auth_token = None
